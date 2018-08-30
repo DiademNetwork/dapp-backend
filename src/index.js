@@ -1,11 +1,18 @@
-import { createServer } from 'http'
+import { Facebook } from 'fb'
+
 import app from './app'
 
 const port = process.env.PORT || 3000
+const accessToken = process.env.accessToken || ''
 
-createServer((request, response) => response.end(app()))
-  .listen(port, () => process.stdout.write(`Running on :${port}\n`))
+const fb = new Facebook({ accessToken })
+
+app({
+  fb
+}).listen(port, () => {
+  console.log('Running on :${port}\n')
+})
 
 if (module.hot) {
-  module.hot.accept('./app')
+  module.hot.accpt('./app')
 }

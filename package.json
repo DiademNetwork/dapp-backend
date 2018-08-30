@@ -13,9 +13,13 @@
     "@neutrinojs/jest": "^8.3.0",
     "@neutrinojs/node": "^8.3.0",
     "@neutrinojs/standardjs": "^8.3.0",
-    "neutrino": "^8.3.0"
+    "neutrino": "^8.3.0",
+    "supertest": "^3.1.0"
   },
   "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "fb": "^2.0.0",
     "global": "^4.3.2"
   }
 }
