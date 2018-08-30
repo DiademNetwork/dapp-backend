@@ -1,7 +1,7 @@
 {
   "name": "dapp-backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "build/index.js",
   "license": "MIT",
   "scripts": {
     "build": "neutrino build",
@@ -17,5 +17,8 @@
   },
   "dependencies": {
     "global": "^4.3.2"
-  }
+  },
+  "files": [
+    "build"
+  ]
 }
