@@ -20,6 +20,7 @@ describe('Feeds', () => {
     'target': '',
     'time': '2018-09-01T14:42:25.163725',
     'title': 'Igor published winning announcement',
+    'wallet': 'qSnn2aePte9DYwNjwSS4NmwVKzQaraypjY',
     'verb': 'create'
   }
 
