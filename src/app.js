@@ -52,8 +52,21 @@ export default ({ fb, users, achievements, feed }) => {
     }
   })
 
-  app.post('/achieve', async (req, res) => {
+  app.post('/create', async (req, res) => {
+    try {
+      const { user, target, title } = req.body
 
+      await feed.addActivity({
+        actor: user,
+        verb: 'create',
+        target,
+        title
+      })
+
+      res.sendStatus(200)
+    } catch(e) {
+      res.sendStatus(500)
+    }
   })
 
   return app

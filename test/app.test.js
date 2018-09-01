@@ -7,6 +7,7 @@ const user = '7flash'
 const existingUser = '8flash'
 const token = 'facebookauth'
 const target = 'link_to_facebook_post'
+const title = 'john posted 5 chapter'
 
 const fb = {
   api: jest.fn(() => Promise.resolve({ user_id: user, is_valid: true }))
@@ -38,6 +39,22 @@ describe('App', () => {
     server.close()
   })
 
+  describe('Creation handler', () => {
+    it('should add achievement to common feed', async () => {
+      await request(server)
+        .post('/create')
+        .send({ user, target, title })
+        .expect(200)
+
+      expect(feed.addActivity).toHaveBeenCalledWith({
+        actor: user,
+        verb: 'create',
+        target,
+        title
+      })
+    })
+  })
+
   describe('Confirmation handler', () => {
     it('should confirm achievement on behalf of user', async () => {
       await request(server)
@@ -49,6 +66,13 @@ describe('App', () => {
         actor: user,
         verb: 'confirm',
         target
+      })
+
+      expect(feed.addActivity).toHaveBeenCalledWith({
+        actor: user,
+        verb: 'create',
+        target,
+        title
       })
     })
   })
