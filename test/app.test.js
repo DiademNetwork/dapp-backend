@@ -17,9 +17,9 @@ const txid = '0xd6ed9643ffe97dd5b43613f0b5602db5c10ebc819ccad795c4fd188e9239290f
 const users = {
   send: jest.fn(() => Promise.resolve(txid)),
   call: jest.fn((requestedUser) => {
-    return requestedUser === existingUser ?
-      Promise.resolve({ outputs: [user, address] }) :
-      Promise.resolve({ outputs: [''] })
+    return requestedUser === existingUser
+      ? Promise.resolve({ outputs: [user, address] })
+      : Promise.resolve({ outputs: [''] })
   })
 }
 const achievements = {

@@ -1,9 +1,9 @@
 require('dotenv').config()
 
-var stream = require('getstream');
+var stream = require('getstream')
 
-client = stream.connect(process.env.STREAM_KEY, process.env.STREAM_SECRET, process.env.STREAM_APPID)
-feed = client.feed(process.env.STREAM_FEED, 'common')
+const client = stream.connect(process.env.STREAM_KEY, process.env.STREAM_SECRET, process.env.STREAM_APPID)
+const feed = client.feed(process.env.STREAM_FEED, 'common')
 
 const activities = [{
   title: 'Igor published winning announcement', // message that will be displayed
