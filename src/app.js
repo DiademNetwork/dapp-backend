@@ -1,8 +1,8 @@
 import express from 'express'
 import bodyParser from 'body-parser'
-import { isAddress } from './helpers'
+import { isAddress, isValidToken } from './helpers'
 
-export default ({ fb, users, achievements }) => {
+export default ({ fb, users, achievements, feed }) => {
   const app = express()
   app.use(bodyParser())
 
@@ -29,6 +29,31 @@ export default ({ fb, users, achievements }) => {
     } catch(e) {
       res.sendStatus(500)
     }
+  })
+
+  app.post('/confirm', async (req, res) => {
+    try {
+      const { user, token, target } = req.body
+
+      const response = await fb.api('debug_token', { input_token: token })
+
+      if (!response.is_valid || response.user_id !== user)
+        throw new Error(`${token} is not valid access for ${user}`)
+
+      await feed.addActivity({
+        actor: user,
+        verb: 'confirm',
+        target: target
+      })
+
+      res.sendStatus(200)
+    } catch(e) {
+      res.sendStatus(500)
+    }
+  })
+
+  app.post('/achieve', async (req, res) => {
+
   })
 
   return app

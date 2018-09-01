@@ -6,6 +6,7 @@ const address = '0xA6279eF0c0C4BEa836E7e22AcC445f74BEa33CbD'
 const user = '7flash'
 const existingUser = '8flash'
 const token = 'facebookauth'
+const target = 'link_to_facebook_post'
 
 const fb = {
   api: jest.fn(() => Promise.resolve({ user_id: user, is_valid: true }))
@@ -23,15 +24,33 @@ const users = {
 const achievements = {
   send: jest.fn(() => Promise.resolve(txid))
 }
+const feed = {
+  addActivity: jest.fn(() => Promise.resolve())
+}
 
 describe('App', () => {
   let server = null
 
   beforeAll(() => {
-    server = app({ fb, users, achievements }).listen(port)
+    server = app({ fb, users, achievements, feed }).listen(port)
   })
   afterAll(() => {
     server.close()
+  })
+
+  describe('Confirmation handler', () => {
+    it('should confirm achievement on behalf of user', async () => {
+      await request(server)
+        .post('/confirm')
+        .send({ user, token, target })
+        .expect(200)
+
+      expect(feed.addActivity).toHaveBeenCalledWith({
+        actor: user,
+        verb: 'confirm',
+        target
+      })
+    })
   })
 
   describe('Register handler', () => {
