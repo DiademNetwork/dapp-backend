@@ -154,15 +154,17 @@ contract Rewards {
         external returns (bool)
     {
         require(achievements.checkAchievementExists(_linkHash) == true);
-        require(achievements.getAchievementCreator(_linkHash) == msg.sender);
         require(deposits[_linkHash][_witness] > 0);
+
+
+        address beneficiary = achievements.getAchievementCreator(_linkHash);
 
         uint256 value = deposits[_linkHash][_witness];
         deposits[_linkHash][_witness] = 0;
 
-        msg.sender.transfer(value);
+        beneficiary.transfer(value);
 
-        emit Withdraw(_linkHash, _witness, value, msg.sender);
+        emit Withdraw(_linkHash, _witness, value, beneficiary);
 
         return true;
     }
