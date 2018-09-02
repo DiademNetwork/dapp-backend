@@ -6,6 +6,18 @@ export default ({ fb, users, achievements, feed }) => {
   const app = express()
   app.use(bodyParser())
 
+  app.use(function (req, res, next) {
+    res.setHeader('Access-Control-Allow-Origin', 'https://diademnetwork.github.io')
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
+
+    next()
+  })
+
+  app.get('/ping', (req, res) => {
+    res.json({ pong: 'pong' })
+  })
+
   app.post('/register', async (req, res) => {
     try {
       const { address, user, token } = req.body
