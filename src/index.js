@@ -1,29 +1,23 @@
-import dotenv from 'dotenv'
+var http, options, proxy, url;
 
-import { Facebook } from 'fb'
-import stream from 'getstream'
+http = require("http");
 
-import app from './app'
-dotenv.config()
+url = require("url");
 
-const achievements = null
-const users = {
-  send: () => Promise.resolve('0x123'),
-  call: () => Promise.resolve({ outputs: [''] })
-}
+proxy = url.parse(process.env.QUOTAGUARDSTATIC_URL);
+target  = url.parse("http://ip.quotaguard.com/");
 
-const fb = new Facebook({ accessToken: process.env.ACCESS_TOKEN })
+options = {
+  hostname: proxy.hostname,
+  port: proxy.port || 80,
+  path: target.href,
+  headers: {
+    "Proxy-Authorization": "Basic " + (new Buffer(proxy.auth).toString("base64")),
+    "Host" : target.hostname
+  }
+};
 
-const client = stream.connect(process.env.STREAM_KEY, process.env.STREAM_SECRET)
-const feed = client.feed(process.env.STREAM_FEED, 'common')
-
-const port = process.env.PORT || 3000
-app({
-  fb, users, achievements, feed
-}).listen(port, () => {
-  console.log(`Running on :${port}\n`)
-})
-
-if (module.hot) {
-  module.hot.accept('./app')
-}
+http.get(options, function(res) {
+  res.pipe(process.stdout);
+  return console.log("status code", res.statusCode);
+});
