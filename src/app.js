@@ -36,6 +36,7 @@ export default ({ fb, users, achievements, feed }) => {
 
       res.json({ txid })
     } catch (e) {
+      console.error(e)
       res.sendStatus(500)
     }
   })
@@ -56,6 +57,7 @@ export default ({ fb, users, achievements, feed }) => {
 
       res.sendStatus(200)
     } catch (e) {
+      console.error(e)
       res.sendStatus(500)
     }
   })
@@ -73,6 +75,7 @@ export default ({ fb, users, achievements, feed }) => {
 
       res.sendStatus(200)
     } catch (e) {
+      console.error(e)
       res.sendStatus(500)
     }
   })
