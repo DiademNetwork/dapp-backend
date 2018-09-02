@@ -16,6 +16,6 @@ const options = {
 }
 
 http.get(options, function (res) {
-  res.pipe(process.stdout)
+  console.log(res)
   return console.log('status code', res.statusCode)
 })
