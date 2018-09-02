@@ -30,7 +30,7 @@ export default ({ fb, users, achievements, feed }) => {
 
   app.post('/confirm', async (req, res) => {
     try {
-      const { user, token, target } = req.body
+      const { user, token, object } = req.body
 
       const response = await fb.api('debug_token', { input_token: token })
 
@@ -39,7 +39,7 @@ export default ({ fb, users, achievements, feed }) => {
       await feed.addActivity({
         actor: user,
         verb: 'confirm',
-        target: target
+        object
       })
 
       res.sendStatus(200)
@@ -50,12 +50,12 @@ export default ({ fb, users, achievements, feed }) => {
 
   app.post('/create', async (req, res) => {
     try {
-      const { user, target, title } = req.body
+      const { user, object, title } = req.body
 
       await feed.addActivity({
         actor: user,
         verb: 'create',
-        target,
+        object,
         title
       })
 

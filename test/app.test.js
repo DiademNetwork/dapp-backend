@@ -6,7 +6,7 @@ const address = '0xA6279eF0c0C4BEa836E7e22AcC445f74BEa33CbD'
 const user = '7flash'
 const existingUser = '8flash'
 const token = 'facebookauth'
-const target = 'link_to_facebook_post'
+const object = 'link_to_facebook_post'
 const title = 'john posted 5 chapter'
 
 const fb = {
@@ -43,13 +43,13 @@ describe('App', () => {
     it('should add achievement to common feed', async () => {
       await request(server)
         .post('/create')
-        .send({ user, target, title })
+        .send({ user, object, title })
         .expect(200)
 
       expect(feed.addActivity).toHaveBeenCalledWith({
         actor: user,
         verb: 'create',
-        target,
+        object,
         title
       })
     })
@@ -59,19 +59,19 @@ describe('App', () => {
     it('should confirm achievement on behalf of user', async () => {
       await request(server)
         .post('/confirm')
-        .send({ user, token, target })
+        .send({ user, token, object })
         .expect(200)
 
       expect(feed.addActivity).toHaveBeenCalledWith({
         actor: user,
         verb: 'confirm',
-        target
+        object
       })
 
       expect(feed.addActivity).toHaveBeenCalledWith({
         actor: user,
         verb: 'create',
-        target,
+        object,
         title
       })
     })
