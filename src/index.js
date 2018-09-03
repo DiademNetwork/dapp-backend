@@ -14,7 +14,7 @@ const users = {
     usersRegistered[user] = address
     return Promise.resolve()
   },
-  call: (command, user) => {
+  call: (command, [user]) => {
     if (usersRegistered[user]) {
       return Promise.resolve({
         exists: true,
@@ -22,7 +22,10 @@ const users = {
         user
       })
     } else {
-      return Promise.resolve([''])
+      return Promise.resolve({
+        exists: false,
+        user
+      })
     }
   }
 }

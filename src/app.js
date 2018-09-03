@@ -18,6 +18,19 @@ export default ({ fb, users, achievements, feed }) => {
     res.json({ pong: 'pong' })
   })
 
+  app.post('/check', async (req, res) => {
+    try {
+      const { user } = req.body
+
+      const userFound = await users.call('getUser', [user])
+
+      res.json(userFound)
+    } catch (e) {
+      console.error(e)
+      res.sendStatus(500)
+    }
+  })
+
   app.post('/register', async (req, res) => {
     try {
       const { address, user, token } = req.body
@@ -30,15 +43,15 @@ export default ({ fb, users, achievements, feed }) => {
         res.json({ invalidToken: true })
       }
 
-      const existingUser = await users.call('getUser', [user])
+      const userFound = await users.call('getUser', [user])
 
-      if (existingUser.outputs && existingUser.outputs[0].toString().length > 0) {
-        res.json({ alreadyExists: true })
+      if (userFound.exists === true) {
+        return res.json(userFound)
       }
 
       const txid = await users.send('register', [address, user])
 
-      res.json({ txid })
+      res.json({ txid, user, address })
     } catch (e) {
       console.error(e)
       res.sendStatus(500)
