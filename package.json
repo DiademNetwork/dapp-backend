@@ -13,6 +13,7 @@
     "@neutrinojs/jest": "^8.3.0",
     "@neutrinojs/node": "^8.3.0",
     "@neutrinojs/standardjs": "^8.3.0",
+    "lorem-ipsum": "^1.0.6",
     "neutrino": "^8.3.0",
     "supertest": "^3.1.0"
   },

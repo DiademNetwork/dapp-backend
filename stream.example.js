@@ -1,28 +1,79 @@
 require('dotenv').config()
 
-var stream = require('getstream')
+const stream = require('getstream')
+const p = require('lorem-ipsum')
 
 const client = stream.connect(process.env.STREAM_KEY, process.env.STREAM_SECRET, process.env.STREAM_APPID)
 const feed = client.feed(process.env.STREAM_FEED, 'common')
 
-const activities = [{
-  title: 'Igor published winning announcement', // message that will be displayed
-  name: 'Igor Berlenko', // author of achievement
-  link: 'https://medium.com/@igorberlenko/diadem-network-is-moving-to-qtum-blockchain-f09887233733', // link to achievement
-  wallet: 'qSnn2aePte9DYwNjwSS4NmwVKzQaraypjY',
-  object: '55684912a4c55e4008388c3278fb1228e2a20d0b4703d50f202280e39d7d34fc', // sha256 from link
-  actor: '100004609778664', // id of author in facebook,
-  verb: 'create'
-}, {
-  object: '55684912a4c55e4008388c3278fb1228e2a20d0b4703d50f202280e39d7d34fc',
-  actor: 'kulachenko',
-  verb: 'confirm'
-}, {
-  object: '55684912a4c55e4008388c3278fb1228e2a20d0b4703d50f202280e39d7d34fc',
-  actor: 'nikkulikov',
-  verb: 'confirm'
-}]
+let activities = []
 
-activities.forEach((item) => {
-  feed.addActivity(item)
+const w = (wordsCount) => {
+  return {
+    units: 'words',
+    count: wordsCount
+  }
+}
+
+const createAchievement = () => ({
+  title: p(w(4)),
+  name: p(w(2)),
+  link: 'https://'.concat(p(w(1))),
+  wallet: '0x'.concat(p(w(1))),
+  object: p(w(1)),
+  actor: p(w(1)),
+  verb: 'create'
 })
+
+const confirmAchievement = (object) => ({
+  object: object,
+  actor: p(w(1)),
+  verb: 'confirm'
+})
+
+const depositReward = (object, witness) => ({
+  object: object,
+  witness: witness,
+  actor: p(w(1)),
+  amount: Math.random()*1000,
+  verb: 'reward'
+})
+
+const nAchievements = 20
+const nWitnesses = 5
+const nRewards = 5
+
+for(let i = 0; i < nAchievements; i++) {
+  const achievement = createAchievement()
+  activities.push(achievement)
+
+  for (let j = 0; j < nWitnesses; j++) {
+    const witness = confirmAchievement(achievement.object)
+    activities.push(witness)
+
+    const reward = depositReward(achievement.object, witness.actor)
+    activities.push(reward)
+  }
+}
+
+const purge = () => {
+  feed.get({ limit: 100 }).then((list) => {
+    list.results.forEach((item) => {
+      if (item.activities) {
+        item.activities.forEach((activity) => {
+          feed.removeActivity(activity.id)
+        })
+      } else {
+        feed.removeActivity(item.id)
+      }
+    })
+  })
+}
+
+const populate = () => {
+  activities.forEach((activity) => {
+    feed.addActivity(activity)
+  })
+}
+
+populate()
