@@ -35,7 +35,7 @@ const depositReward = (object, witness) => ({
   object: object,
   witness: witness,
   actor: p(w(1)),
-  amount: Math.random()*1000,
+  amount: Math.random() * 1000,
   verb: 'reward'
 })
 
@@ -43,7 +43,7 @@ const nAchievements = 20
 const nWitnesses = 5
 const nRewards = 5
 
-for(let i = 0; i < nAchievements; i++) {
+for (let i = 0; i < nAchievements; i++) {
   const achievement = createAchievement()
   activities.push(achievement)
 

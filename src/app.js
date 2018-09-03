@@ -26,11 +26,15 @@ export default ({ fb, users, achievements, feed }) => {
 
       const response = await fb.api('debug_token', { input_token: token })
 
-      if (!response.is_valid || response.user_id !== user) { throw new Error(`${token} is not valid access token for ${user}`) }
+      if (!response.is_valid || response.user_id !== user) {
+        res.json({ invalidToken: true })
+      }
 
       const existingUser = await users.call('getUser', [user])
 
-      if (existingUser.outputs && existingUser.outputs[0]) { throw new Error(`${user} has already registered`) }
+      if (existingUser.outputs && existingUser.outputs[0].toString().length > 0) {
+        res.json({ alreadyExists: true })
+      }
 
       const txid = await users.send('register', [address, user])
 

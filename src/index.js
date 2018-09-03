@@ -6,10 +6,25 @@ import stream from 'getstream'
 import app from './app'
 dotenv.config()
 
+let usersRegistered = {}
+
 const achievements = null
 const users = {
-  send: () => Promise.resolve('0x123'),
-  call: () => Promise.resolve({ outputs: [''] })
+  send: (command, [address, user]) => {
+    usersRegistered[user] = address
+    return Promise.resolve()
+  },
+  call: (command, user) => {
+    if (usersRegistered[user]) {
+      return Promise.resolve({
+        exists: true,
+        address: usersRegistered[user],
+        user
+      })
+    } else {
+      return Promise.resolve([''])
+    }
+  }
 }
 
 const fb = new Facebook({ accessToken: process.env.ACCESS_TOKEN })
