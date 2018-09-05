@@ -50,7 +50,7 @@ export default ({ fb, feed, users, achievements, rewards }) => {
         return res.status(400).json({ error: 'USER_EXISTS' })
       }
 
-      const txid = await users.send('register', [address, user])
+      const { txid } = await users.send('register', [address, user])
 
       res.json({ user, address, txid })
     } catch (e) {
@@ -61,15 +61,19 @@ export default ({ fb, feed, users, achievements, rewards }) => {
 
   app.post('/confirm', async (req, res) => {
     try {
-      const { user, token, object } = req.body
+      const { address, user, token, object } = req.body
+
+      if (!isAddress(address)) {
+        return res.status(400).json({ error: 'INVALID_ADDRESS ' })
+      }
 
       if (!isAccountOwner(fb, user, token)) {
         return res.status(400).json({ error: 'INVALID_TOKEN' })
       }
 
-      const txid = await users.send('confirmFrom', [user, object])
+      const { txid } = await users.send('confirmFrom', [address, object])
 
-      res.json({ user, object, txid })
+      res.json({ user, address, object, txid })
     } catch (e) {
       console.error(e)
       res.sendStatus(500)
@@ -78,11 +82,19 @@ export default ({ fb, feed, users, achievements, rewards }) => {
 
   app.post('/create', async (req, res) => {
     try {
-      const { user, object, contentHash, title } = req.body
+      const { user, token, address, object, contentHash, title } = req.body
 
-      const txid = await achievements.send('createFrom', [user, object, contentHash, title])
+      if (!isAddress(address)) {
+        return res.status(400).json({ error: 'INVALID_ADDRESS' })
+      }
 
-      res.json({ user, object, txid })
+      if (!isAccountOwner(fb, user, token)) {
+        return res.status(400).json({ error: 'INVALID_TOKEN' })
+      }
+
+      const { txid } = await achievements.send('createFrom', [address, object, contentHash, title])
+
+      res.json({ user, address, object, contentHash, title, txid })
     } catch (e) {
       console.error(e)
       res.sendStatus(500)

@@ -9,6 +9,7 @@ const existingUser = '8flash'
 const token = 'facebookauth'
 const object = 'link_to_facebook_post'
 const title = 'john posted 5 chapter'
+const contentHash = '0x111'
 
 const fb = {
   api: jest.fn((method, args) => {
@@ -29,7 +30,7 @@ const users = {
       addr2acc[address] = user
       acc2addr[user] = address
     }
-    return Promise.resolve(txid)
+    return Promise.resolve({ txid })
   }),
   call: jest.fn((command, [user]) => {
     let response = null
@@ -65,8 +66,8 @@ describe('App', () => {
     it('should add achievement to common feed', async () => {
       await request(server)
         .post('/create')
-        .send({ user, object, title })
-        .expect(200)
+        .send({ user, address, object, contentHash, title })
+        .expect({ user, address, object, contentHash, title, txid })
     })
   })
 
@@ -74,8 +75,8 @@ describe('App', () => {
     it('should confirm achievement on behalf of user', async () => {
       await request(server)
         .post('/confirm')
-        .send({ user, token, object })
-        .expect(200)
+        .send({ user, address, token, object })
+        .expect({ user, address, object, txid })
     })
   })
 
