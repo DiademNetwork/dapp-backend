@@ -30,6 +30,9 @@ const users = {
 const achievements = {
   send: () => Promise.resolve(txid)
 }
+const rewards = {
+  send: jest.fn(() => Promise.resolve(txid))
+}
 
 const fb = new Facebook({ accessToken: process.env.ACCESS_TOKEN })
 

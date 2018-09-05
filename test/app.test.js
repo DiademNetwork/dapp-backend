@@ -43,6 +43,9 @@ const users = {
 const achievements = {
   send: jest.fn(() => Promise.resolve(txid))
 }
+const rewards = {
+  send: jest.fn(() => Promise.resolve(txid))
+}
 const feed = {
   addActivity: jest.fn(() => Promise.resolve())
 }
@@ -51,7 +54,7 @@ describe('App', () => {
   let server = null
 
   beforeAll(() => {
-    server = app({ fb, users, achievements, feed }).listen(port)
+    server = app({ fb, feed, users, achievements, rewards }).listen(port)
   })
   afterAll(() => {
     server.close()
@@ -99,6 +102,15 @@ describe('App', () => {
         .post('/register')
         .send({ address, user: existingUser, token })
         .expect({ error: 'USER_EXISTS' })
+    })
+  })
+
+  describe('Withdraw handler', () => {
+    it('should transfer funds to creator of achievement when witness associated with reward has confirmed achievement', async () => {
+      await request(server)
+        .post('/withdraw')
+        .send({ object, witness: existingUserAddress })
+        .expect({ txid, object, witness: existingUserAddress })
     })
   })
 })

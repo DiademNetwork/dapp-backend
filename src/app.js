@@ -2,7 +2,7 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import { isAddress, isAccountOwner } from './helpers'
 
-export default ({ fb, users, achievements, feed }) => {
+export default ({ fb, feed, users, achievements, rewards }) => {
   const app = express()
   app.use(bodyParser())
 
@@ -82,7 +82,24 @@ export default ({ fb, users, achievements, feed }) => {
 
       const txid = await achievements.send('createFrom', [user, object, contentHash, title])
 
-      res.sendStatus({ txid })
+      res.json({ user, object, txid })
+    } catch (e) {
+      console.error(e)
+      res.sendStatus(500)
+    }
+  })
+
+  app.post('/withdraw', async (req, res) => {
+    try {
+      const { object, witness } = req.body
+
+      if (!isAddress(witness)) {
+        return res.status(400).json({ error: 'INVALID_ADDRESS' })
+      }
+
+      const txid = await rewards.send('withdraw', [object, witness])
+
+      res.json({ txid, object, witness })
     } catch (e) {
       console.error(e)
       res.sendStatus(500)
