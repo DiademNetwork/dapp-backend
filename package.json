@@ -23,6 +23,7 @@
     "express": "^4.16.3",
     "fb": "^2.0.0",
     "getstream": "^3.20.0",
-    "global": "^4.3.2"
+    "global": "^4.3.2",
+    "qtumcore-lib": "^0.0.1"
   }
 }
