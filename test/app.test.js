@@ -27,6 +27,7 @@ const users = {
   send: jest.fn((command, [address, user]) => {
     if (command == 'register') {
       addr2acc[address] = user
+      acc2addr[user] = address
     }
     return Promise.resolve(txid)
   }),
