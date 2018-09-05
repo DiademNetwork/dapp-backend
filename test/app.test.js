@@ -101,4 +101,13 @@ describe('App', () => {
         .expect({ error: 'USER_EXISTS' })
     })
   })
+
+  describe('Withdraw handler', () => {
+    it('should transfer funds to creator of achievement when witness associated with reward has confirmed achievement', async () => {
+      await request(server)
+        .post('/withdraw')
+        .send({ object, witness: existingUserAddress })
+        .expect({ txid, object, witness: existingUserAddress })
+    })
+  })
 })
