@@ -2,7 +2,8 @@ import request from 'supertest'
 import app from '../src/app'
 
 const port = process.env.PORT || 3000
-const address = '0xA6279eF0c0C4BEa836E7e22AcC445f74BEa33CbD'
+const address = 'qb9u5JU9vFCZ7bdN4odZezvYgk6JnQmVkq'
+const existingUserAddress = 'qUphwvjrPEGuDo4t8E1FQNq7YXzgzwx9k7'
 const user = '7flash'
 const existingUser = '8flash'
 const token = 'facebookauth'
@@ -10,16 +11,33 @@ const object = 'link_to_facebook_post'
 const title = 'john posted 5 chapter'
 
 const fb = {
-  api: jest.fn(() => Promise.resolve({ user_id: user, is_valid: true }))
+  api: jest.fn((method, args) => {
+    if (args.input_token == token) return { user_id: user, is_valid: true }
+    else return { user_id: existingUser, is_valid: true }
+  })
 }
 
 const txid = '0xd6ed9643ffe97dd5b43613f0b5602db5c10ebc819ccad795c4fd188e9239290f'
+
+let addr2acc = {}
+let acc2addr = {}
+addr2acc[existingUserAddress] = existingUser
+acc2addr[existingUser] = existingUserAddress
 const users = {
-  send: jest.fn(() => Promise.resolve(txid)),
-  call: jest.fn((requestedUser) => {
-    return requestedUser === existingUser
-      ? Promise.resolve({ outputs: [user, address] })
-      : Promise.resolve({ outputs: [''] })
+  send: jest.fn((command, [address, user]) => {
+    if (command == 'register') {
+      addr2acc[address] = user
+    }
+    return Promise.resolve(txid)
+  }),
+  call: jest.fn((command, [user]) => {
+    let response = null
+    if (command === 'exists') {
+      response = addr2acc[user]
+    } else {
+      response = acc2addr[user]
+    }
+    return Promise.resolve(response)
   })
 }
 const achievements = {
@@ -45,13 +63,6 @@ describe('App', () => {
         .post('/create')
         .send({ user, object, title })
         .expect(200)
-
-      expect(feed.addActivity).toHaveBeenCalledWith({
-        actor: user,
-        verb: 'create',
-        object,
-        title
-      })
     })
   })
 
@@ -61,19 +72,6 @@ describe('App', () => {
         .post('/confirm')
         .send({ user, token, object })
         .expect(200)
-
-      expect(feed.addActivity).toHaveBeenCalledWith({
-        actor: user,
-        verb: 'confirm',
-        object
-      })
-
-      expect(feed.addActivity).toHaveBeenCalledWith({
-        actor: user,
-        verb: 'create',
-        object,
-        title
-      })
     })
   })
 
@@ -82,10 +80,10 @@ describe('App', () => {
       await request(server)
         .post('/register')
         .send({ address, user, token })
-        .expect({ txid })
+        .expect({ user, address, txid })
 
       expect(fb.api).toHaveBeenCalledWith('debug_token', { input_token: token })
-      expect(users.call).toHaveBeenCalledWith('getUser', [user])
+      expect(users.call).toHaveBeenCalledWith('exists', [address])
       expect(users.send).toHaveBeenCalledWith('register', [address, user])
     })
 
@@ -93,13 +91,14 @@ describe('App', () => {
       await request(server)
         .post('/register')
         .send({ address: '', user, token })
-        .expect(500)
+        .expect({ error: 'INVALID_ADDRESS' })
     })
 
     it('should throw error for already registered user', async () => {
       await request(server)
         .post('/register')
         .send({ address, user: existingUser, token })
+        .expect({ error: 'USER_EXISTS' })
     })
   })
 })

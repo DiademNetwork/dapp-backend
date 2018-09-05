@@ -1,10 +1,15 @@
 import express from 'express'
 import bodyParser from 'body-parser'
-import { isAddress } from './helpers'
+import { isAddress, isAccountOwner } from './helpers'
 
 export default ({ fb, users, achievements, feed }) => {
   const app = express()
   app.use(bodyParser())
+
+  app.use((req, res, next) => {
+    console.log(req.body)
+    next()
+  })
 
   app.get('/ping', (req, res) => {
     res.json({ pong: 'pong' })
@@ -14,11 +19,15 @@ export default ({ fb, users, achievements, feed }) => {
     try {
       const { user } = req.body
 
-      const userFound = await users.call('getUser', [user])
+      const account = await users.call('accountExists', [user])
 
-      res.json(userFound)
-    } catch (e) {
-      console.error(e)
+      if (account) {
+        return res.json({ exists: true, account })
+      } else {
+        return res.json({ exists: false })
+      }
+    } catch (error) {
+      console.error(error)
       res.sendStatus(500)
     }
   })
@@ -27,23 +36,23 @@ export default ({ fb, users, achievements, feed }) => {
     try {
       const { address, user, token } = req.body
 
-      if (!isAddress(address)) { throw new Error(`${address} is not valid wallet`) }
-
-      const response = await fb.api('debug_token', { input_token: token })
-
-      if (!response.is_valid || response.user_id !== user) {
-        res.json({ invalidToken: true })
+      if (!isAddress(address)) {
+        return res.status(400).json({ error: 'INVALID_ADDRESS' })
       }
 
-      const userFound = await users.call('getUser', [user])
+      if (!isAccountOwner(fb, user, token)) {
+        return res.status(400).json({ error: 'INVALID_TOKEN' })
+      }
 
-      if (userFound.exists === true) {
-        return res.json(userFound)
+      const userExists = await users.call('exists', [address])
+
+      if (userExists) {
+        return res.status(400).json({ error: 'USER_EXISTS' })
       }
 
       const txid = await users.send('register', [address, user])
 
-      res.json({ txid, user, address })
+      res.json({ user, address, txid })
     } catch (e) {
       console.error(e)
       res.sendStatus(500)
@@ -54,17 +63,13 @@ export default ({ fb, users, achievements, feed }) => {
     try {
       const { user, token, object } = req.body
 
-      const response = await fb.api('debug_token', { input_token: token })
+      if (!isAccountOwner(fb, user, token)) {
+        return res.status(400).json({ error: 'INVALID_TOKEN' })
+      }
 
-      if (!response.is_valid || response.user_id !== user) { throw new Error(`${token} is not valid access for ${user}`) }
+      const txid = await users.send('confirmFrom', [user, object])
 
-      await feed.addActivity({
-        actor: user,
-        verb: 'confirm',
-        object
-      })
-
-      res.sendStatus(200)
+      res.json({ user, object, txid })
     } catch (e) {
       console.error(e)
       res.sendStatus(500)
@@ -73,16 +78,11 @@ export default ({ fb, users, achievements, feed }) => {
 
   app.post('/create', async (req, res) => {
     try {
-      const { user, object, title } = req.body
+      const { user, object, contentHash, title } = req.body
 
-      await feed.addActivity({
-        actor: user,
-        verb: 'create',
-        object,
-        title
-      })
+      const txid = await achievements.send('createFrom', [user, object, contentHash, title])
 
-      res.sendStatus(200)
+      res.sendStatus({ txid })
     } catch (e) {
       console.error(e)
       res.sendStatus(500)

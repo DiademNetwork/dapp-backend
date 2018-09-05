@@ -6,28 +6,29 @@ import stream from 'getstream'
 import app from './app'
 dotenv.config()
 
-let usersRegistered = {}
-
-const achievements = null
+// mock smart contracts
+const txid = '0xd6ed9643ffe97dd5b43613f0b5602db5c10ebc819ccad795c4fd188e9239290f'
+let addr2acc = {}
+let acc2addr = {}
 const users = {
   send: (command, [address, user]) => {
-    usersRegistered[user] = address
-    return Promise.resolve()
+    if (command === 'register') {
+      addr2acc[address] = user
+    }
+    return Promise.resolve(txid)
   },
   call: (command, [user]) => {
-    if (usersRegistered[user]) {
-      return Promise.resolve({
-        exists: true,
-        address: usersRegistered[user],
-        user
-      })
+    let response = null
+    if (command === 'exists') {
+      response = addr2acc[user]
     } else {
-      return Promise.resolve({
-        exists: false,
-        user
-      })
+      response = acc2addr[user]
     }
+    return Promise.resolve(response)
   }
+}
+const achievements = {
+  send: () => Promise.resolve(txid)
 }
 
 const fb = new Facebook({ accessToken: process.env.ACCESS_TOKEN })
