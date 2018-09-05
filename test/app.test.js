@@ -10,10 +10,12 @@ const token = 'facebookauth'
 const object = 'link_to_facebook_post'
 const title = 'john posted 5 chapter'
 const contentHash = '0x111'
+const hexAddress = 'c10141756952bc618876bc056ab52b88249cbbc8'
+const hexWitness = '7b8f4f2aac669fccbda9e96c70616bc3c2f0de11'
 
 const fb = {
   api: jest.fn((method, args) => {
-    if (args.input_token == token) return { user_id: user, is_valid: true }
+    if (args.input_token === token) return { user_id: user, is_valid: true }
     else return { user_id: existingUser, is_valid: true }
   })
 }
@@ -26,7 +28,7 @@ addr2acc[existingUserAddress] = existingUser
 acc2addr[existingUser] = existingUserAddress
 const users = {
   send: jest.fn((command, [address, user]) => {
-    if (command == 'register') {
+    if (command === 'register') {
       addr2acc[address] = user
       acc2addr[user] = address
     }
@@ -43,10 +45,10 @@ const users = {
   })
 }
 const achievements = {
-  send: jest.fn(() => Promise.resolve(txid))
+  send: jest.fn(() => Promise.resolve({ txid }))
 }
 const rewards = {
-  send: jest.fn(() => Promise.resolve(txid))
+  send: jest.fn(() => Promise.resolve({ txid }))
 }
 const feed = {
   addActivity: jest.fn(() => Promise.resolve())
@@ -67,7 +69,7 @@ describe('App', () => {
       await request(server)
         .post('/create')
         .send({ user, address, object, contentHash, title })
-        .expect({ user, address, object, contentHash, title, txid })
+        .expect({ user, address, object, contentHash, title, txid, hexAddress })
     })
   })
 
@@ -76,7 +78,7 @@ describe('App', () => {
       await request(server)
         .post('/confirm')
         .send({ user, address, token, object })
-        .expect({ user, address, object, txid })
+        .expect({ user, address, object, txid, hexAddress })
     })
   })
 
@@ -85,11 +87,11 @@ describe('App', () => {
       await request(server)
         .post('/register')
         .send({ address, user, token })
-        .expect({ user, address, txid })
+        .expect({ user, address, txid, hexAddress })
 
       expect(fb.api).toHaveBeenCalledWith('debug_token', { input_token: token })
-      expect(users.call).toHaveBeenCalledWith('exists', [address])
-      expect(users.send).toHaveBeenCalledWith('register', [address, user])
+      expect(users.call).toHaveBeenCalledWith('exists', [hexAddress])
+      expect(users.send).toHaveBeenCalledWith('register', [hexAddress, user])
     })
 
     it('should throw error for invalid address', async () => {
@@ -112,7 +114,7 @@ describe('App', () => {
       await request(server)
         .post('/withdraw')
         .send({ object, witness: existingUserAddress })
-        .expect({ txid, object, witness: existingUserAddress })
+        .expect({ txid, object, witness: existingUserAddress, hexWitness })
     })
   })
 })

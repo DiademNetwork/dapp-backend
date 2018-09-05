@@ -1,6 +1,6 @@
 import express from 'express'
 import bodyParser from 'body-parser'
-import { isAddress, isAccountOwner } from './helpers'
+import { isAddress, isAccountOwner, toHexAddress } from './helpers'
 
 export default ({ fb, feed, users, achievements, rewards }) => {
   const app = express()
@@ -44,15 +44,17 @@ export default ({ fb, feed, users, achievements, rewards }) => {
         return res.status(400).json({ error: 'INVALID_TOKEN' })
       }
 
-      const userExists = await users.call('exists', [address])
+      const hexAddress = toHexAddress(address)
+
+      const userExists = await users.call('exists', [hexAddress])
 
       if (userExists) {
         return res.status(400).json({ error: 'USER_EXISTS' })
       }
 
-      const { txid } = await users.send('register', [address, user])
+      const { txid } = await users.send('register', [hexAddress, user])
 
-      res.json({ user, address, txid })
+      res.json({ user, address, hexAddress, txid })
     } catch (e) {
       console.error(e)
       res.sendStatus(500)
@@ -71,9 +73,10 @@ export default ({ fb, feed, users, achievements, rewards }) => {
         return res.status(400).json({ error: 'INVALID_TOKEN' })
       }
 
-      const { txid } = await users.send('confirmFrom', [address, object])
+      const hexAddress = toHexAddress(address)
+      const { txid } = await users.send('confirmFrom', [hexAddress, object])
 
-      res.json({ user, address, object, txid })
+      res.json({ user, address, hexAddress, object, txid })
     } catch (e) {
       console.error(e)
       res.sendStatus(500)
@@ -92,9 +95,10 @@ export default ({ fb, feed, users, achievements, rewards }) => {
         return res.status(400).json({ error: 'INVALID_TOKEN' })
       }
 
-      const { txid } = await achievements.send('createFrom', [address, object, contentHash, title])
+      const hexAddress = toHexAddress(address)
+      const { txid } = await achievements.send('createFrom', [hexAddress, object, contentHash, title])
 
-      res.json({ user, address, object, contentHash, title, txid })
+      res.json({ user, address, hexAddress, object, contentHash, title, txid })
     } catch (e) {
       console.error(e)
       res.sendStatus(500)
@@ -109,9 +113,10 @@ export default ({ fb, feed, users, achievements, rewards }) => {
         return res.status(400).json({ error: 'INVALID_ADDRESS' })
       }
 
-      const txid = await rewards.send('withdraw', [object, witness])
+      const hexWitness = toHexAddress(witness)
+      const { txid } = await rewards.send('withdraw', [object, hexWitness])
 
-      res.json({ txid, object, witness })
+      res.json({ txid, object, witness, hexWitness })
     } catch (e) {
       console.error(e)
       res.sendStatus(500)

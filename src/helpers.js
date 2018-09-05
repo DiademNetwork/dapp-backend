@@ -1,4 +1,5 @@
 import { Address } from 'qtumcore-lib'
+import bs58 from 'bs58'
 
 const isAddress = (address) => {
   return Address.isValid(address)
@@ -14,7 +15,15 @@ const isAccountOwner = async (fb, user, token) => {
   }
 }
 
+const toHexAddress = (address) => {
+  const bytes = bs58.decode(address)
+  const hexAddress = bytes.toString('hex').slice(2, 42)
+
+  return hexAddress
+}
+
 export {
   isAddress,
-  isAccountOwner
+  isAccountOwner,
+  toHexAddress
 }
