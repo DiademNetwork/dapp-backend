@@ -28,7 +28,7 @@ const users = {
     if (command == 'register') {
       addr2acc[address] = user
     }
-    return Promise.resolve(txid)
+    return Promise.resolve({ txid })
   }),
   call: jest.fn((command, [user]) => {
     let response = null
@@ -37,11 +37,11 @@ const users = {
     } else {
       response = acc2addr[user]
     }
-    return Promise.resolve(response)
+    return Promise.resolve({ outputs: [response] })
   })
 }
 const achievements = {
-  send: jest.fn(() => Promise.resolve(txid))
+  send: jest.fn(() => Promise.resolve({ txid }))
 }
 const feed = {
   addActivity: jest.fn(() => Promise.resolve())

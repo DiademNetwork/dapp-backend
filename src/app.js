@@ -19,7 +19,7 @@ export default ({ fb, users, achievements, feed }) => {
     try {
       const { user } = req.body
 
-      const account = await users.call('accountExists', [user])
+      const account = (await users.call('accountExists', [user])).outputs[0]
 
       if (account) {
         return res.json({ exists: true, account })
@@ -44,13 +44,13 @@ export default ({ fb, users, achievements, feed }) => {
         return res.status(400).json({ error: 'INVALID_TOKEN' })
       }
 
-      const userExists = await users.call('exists', [address])
+      const userExists = (await users.call('exists', [address])).outputs[0]
 
       if (userExists) {
         return res.status(400).json({ error: 'USER_EXISTS' })
       }
 
-      const txid = await users.send('register', [address, user])
+      const { txid } = await users.send('register', [address, user])
 
       res.json({ user, address, txid })
     } catch (e) {
@@ -67,7 +67,7 @@ export default ({ fb, users, achievements, feed }) => {
         return res.status(400).json({ error: 'INVALID_TOKEN' })
       }
 
-      const txid = await users.send('confirmFrom', [user, object])
+      const { txid } = await users.send('confirmFrom', [user, object])
 
       res.json({ user, object, txid })
     } catch (e) {
@@ -80,7 +80,7 @@ export default ({ fb, users, achievements, feed }) => {
     try {
       const { user, object, contentHash, title } = req.body
 
-      const txid = await achievements.send('createFrom', [user, object, contentHash, title])
+      const { txid } = await achievements.send('createFrom', [user, object, contentHash, title])
 
       res.json({ user, object, txid })
     } catch (e) {
@@ -97,7 +97,7 @@ export default ({ fb, users, achievements, feed }) => {
         return res.status(400).json({ error: 'INVALID_ADDRESS' })
       }
 
-      const txid = await achievements.send('withdraw', [object, witness])
+      const { txid } = await achievements.send('withdraw', [object, witness])
 
       res.json({ txid, object, witness })
     } catch (e) {
