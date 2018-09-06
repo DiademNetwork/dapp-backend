@@ -7,7 +7,7 @@ jest.setTimeout(100000)
 
 describe('Contracts', () => {
   const options = {
-    senderAddress: "qZzKHt6Ug9e4FuoNAvbTnVHDquRwpb1APT"
+    senderAddress: 'qZzKHt6Ug9e4FuoNAvbTnVHDquRwpb1APT'
   }
 
   let qtum = null
@@ -19,9 +19,9 @@ describe('Contracts', () => {
     const repo = require('../solar.json')
     qtum = new Qtum(process.env.RPC_URL, repo)
 
-    users = qtum.contract("contracts/Users.sol")
-    achievements = qtum.contract("contracts/Achievements.sol")
-    rewards = qtum.contract("contracts/Rewards.sol")
+    users = qtum.contract('contracts/Users.sol')
+    achievements = qtum.contract('contracts/Achievements.sol')
+    rewards = qtum.contract('contracts/Rewards.sol')
   })
 
   describe('Sponsors support author of book for publishing new chapters', () => {

@@ -114,7 +114,7 @@ describe('App', () => {
       await request(server)
         .post('/withdraw')
         .send({ object, witness: existingUserAddress })
-        .expect({ txid, object, witness: existingUserAddress })
+        .expect({ txid, object, witness: existingUserAddress, hexWitness })
     })
   })
 })

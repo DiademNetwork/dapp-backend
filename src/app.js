@@ -46,7 +46,7 @@ export default ({ fb, feed, users, achievements, rewards }) => {
 
       const hexAddress = toHexAddress(address)
 
-      const userExists = await users.call('exists', [hexAddress])
+      const userExists = (await users.call('exists', [hexAddress])).outputs[0]
 
       if (userExists) {
         return res.status(400).json({ error: 'USER_EXISTS' })
