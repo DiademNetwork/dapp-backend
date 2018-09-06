@@ -41,7 +41,7 @@ const users = {
     } else {
       response = acc2addr[user]
     }
-    return Promise.resolve(response)
+    return Promise.resolve({ outputs: [response] })
   })
 }
 const achievements = {
@@ -114,7 +114,7 @@ describe('App', () => {
       await request(server)
         .post('/withdraw')
         .send({ object, witness: existingUserAddress })
-        .expect({ txid, object, witness: existingUserAddress, hexWitness })
+        .expect({ txid, object, witness: existingUserAddress })
     })
   })
 })

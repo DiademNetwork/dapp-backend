@@ -19,7 +19,7 @@ export default ({ fb, feed, users, achievements, rewards }) => {
     try {
       const { user } = req.body
 
-      const account = await users.call('accountExists', [user])
+      const account = (await users.call('accountExists', [user])).outputs[0]
 
       if (account) {
         return res.json({ exists: true, account })
