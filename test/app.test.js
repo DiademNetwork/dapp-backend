@@ -55,6 +55,31 @@ const feed = {
   addActivity: jest.fn(() => Promise.resolve())
 }
 
+const createTxActivity = {
+  actor: user,
+  object: link,
+  target: txid,
+  verb: 'create'
+}
+const confirmTxActivity = {
+  actor: user,
+  object: link,
+  target: txid,
+  verb: 'confirm'
+}
+const registerTxActivity = {
+  actor: user,
+  object: address,
+  target: txid,
+  verb: 'register'
+}
+const withdrawTxActivity = {
+  actor: existingUserAddress,
+  object: link,
+  target: txid,
+  verb: 'withdraw'
+}
+
 describe('App', () => {
   let server = null
 
@@ -71,6 +96,8 @@ describe('App', () => {
         .post('/create')
         .send({ user, token, address, link, title, previousLink })
         .expect({ user, address, link, contentHash, title, txid, hexAddress, previousLink })
+
+      expect(feed.addActivity).toHaveBeenCalledWith(createTxActivity)
     })
   })
 
@@ -80,6 +107,8 @@ describe('App', () => {
         .post('/confirm')
         .send({ user, address, token, link })
         .expect({ user, address, link, txid, hexAddress })
+
+      expect(feed.addActivity).toHaveBeenCalledWith(confirmTxActivity)
     })
   })
 
@@ -91,8 +120,11 @@ describe('App', () => {
         .expect({ user, address, txid, hexAddress })
 
       expect(fb.api).toHaveBeenCalledWith('debug_token', { input_token: token })
+
       expect(users.call).toHaveBeenCalledWith('exists', [hexAddress])
       expect(users.send).toHaveBeenCalledWith('register', [hexAddress, user])
+
+      expect(feed.addActivity).toHaveBeenCalledWith(registerTxActivity)
     })
 
     it('should throw error for invalid address', async () => {
@@ -116,6 +148,8 @@ describe('App', () => {
         .post('/withdraw')
         .send({ link, witness: existingUserAddress })
         .expect({ txid, link, witness: existingUserAddress, hexWitness })
+
+      expect(feed.addActivity).toHaveBeenCalledWith(withdrawTxActivity)
     })
   })
 })

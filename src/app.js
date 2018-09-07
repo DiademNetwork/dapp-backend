@@ -54,6 +54,13 @@ export default ({ fb, feed, users, achievements, rewards }) => {
 
       const { txid } = await users.send('register', [hexAddress, user])
 
+      await feed.addActivity({
+        actor: user,
+        object: address,
+        target: txid,
+        verb: 'register'
+      })
+
       res.json({ user, address, hexAddress, txid })
     } catch (e) {
       console.error(e)
@@ -75,6 +82,13 @@ export default ({ fb, feed, users, achievements, rewards }) => {
 
       const hexAddress = toHexAddress(address)
       const { txid } = await users.send('confirmFrom', [hexAddress, link])
+
+      await feed.addActivity({
+        actor: user,
+        object: link,
+        target: txid,
+        verb: 'confirm'
+      })
 
       res.json({ user, address, hexAddress, link, txid })
     } catch (e) {
@@ -106,6 +120,13 @@ export default ({ fb, feed, users, achievements, rewards }) => {
 
       const { txid } = await achievements.send('createFrom', args)
 
+      await feed.addActivity({
+        actor: user,
+        object: link,
+        target: txid,
+        verb: 'create'
+      })
+
       res.json({ user, address, hexAddress, link, title, previousLink, txid, contentHash })
     } catch (e) {
       console.error(e)
@@ -123,6 +144,13 @@ export default ({ fb, feed, users, achievements, rewards }) => {
 
       const hexWitness = toHexAddress(witness)
       const { txid } = await rewards.send('withdraw', [link, hexWitness])
+
+      await feed.addActivity({
+        actor: witness,
+        object: link,
+        target: txid,
+        verb: 'withdraw'
+      })
 
       res.json({ txid, link, witness, hexWitness })
     } catch (e) {
