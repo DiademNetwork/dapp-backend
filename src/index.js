@@ -9,7 +9,7 @@ dotenv.config()
 
 const fb = new Facebook({ accessToken: process.env.ACCESS_TOKEN })
 
-const repo = require('../solar.json')
+const repo = require('../solar.development.json')
 const qtum = new Qtum(process.env.RPC_URL, repo)
 const users = qtum.contract('contracts/Users.sol')
 const achievements = qtum.contract('contracts/Achievements.sol')
