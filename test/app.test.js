@@ -7,11 +7,12 @@ const existingUserAddress = 'qUphwvjrPEGuDo4t8E1FQNq7YXzgzwx9k7'
 const user = '7flash'
 const existingUser = '8flash'
 const token = 'facebookauth'
-const object = 'link_to_facebook_post'
+const link = 'link_to_facebook_post' // `object` field in feeds
 const title = 'john posted 5 chapter'
-const contentHash = '0x111'
+const contentHash = 'link_to_facebook_post'
 const hexAddress = 'c10141756952bc618876bc056ab52b88249cbbc8'
 const hexWitness = '7b8f4f2aac669fccbda9e96c70616bc3c2f0de11'
+const previousLink = '' // previous link is empty when user creates new chain
 
 const fb = {
   api: jest.fn((method, args) => {
@@ -68,8 +69,8 @@ describe('App', () => {
     it('should add achievement to common feed', async () => {
       await request(server)
         .post('/create')
-        .send({ user, address, object, contentHash, title })
-        .expect({ user, address, object, contentHash, title, txid, hexAddress })
+        .send({ user, token, address, link, title, previousLink })
+        .expect({ user, address, link, contentHash, title, txid, hexAddress, previousLink })
     })
   })
 
@@ -77,8 +78,8 @@ describe('App', () => {
     it('should confirm achievement on behalf of user', async () => {
       await request(server)
         .post('/confirm')
-        .send({ user, address, token, object })
-        .expect({ user, address, object, txid, hexAddress })
+        .send({ user, address, token, link })
+        .expect({ user, address, link, txid, hexAddress })
     })
   })
 
@@ -113,8 +114,8 @@ describe('App', () => {
     it('should transfer funds to creator of achievement when witness associated with reward has confirmed achievement', async () => {
       await request(server)
         .post('/withdraw')
-        .send({ object, witness: existingUserAddress })
-        .expect({ txid, object, witness: existingUserAddress, hexWitness })
+        .send({ link, witness: existingUserAddress })
+        .expect({ txid, link, witness: existingUserAddress, hexWitness })
     })
   })
 })

@@ -22,8 +22,14 @@ const toHexAddress = (address) => {
   return hexAddress
 }
 
+const toContentHash = (link) => {
+  // todo: retrive content by link and return hash from content
+  return link
+}
+
 export {
   isAddress,
   isAccountOwner,
-  toHexAddress
+  toHexAddress,
+  toContentHash
 }

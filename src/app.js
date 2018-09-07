@@ -1,6 +1,6 @@
 import express from 'express'
 import bodyParser from 'body-parser'
-import { isAddress, isAccountOwner, toHexAddress } from './helpers'
+import { isAddress, isAccountOwner, toHexAddress, toContentHash } from './helpers'
 
 export default ({ fb, feed, users, achievements, rewards }) => {
   const app = express()
@@ -63,7 +63,7 @@ export default ({ fb, feed, users, achievements, rewards }) => {
 
   app.post('/confirm', async (req, res) => {
     try {
-      const { address, user, token, object } = req.body
+      const { address, user, token, link } = req.body
 
       if (!isAddress(address)) {
         return res.status(400).json({ error: 'INVALID_ADDRESS ' })
@@ -74,9 +74,9 @@ export default ({ fb, feed, users, achievements, rewards }) => {
       }
 
       const hexAddress = toHexAddress(address)
-      const { txid } = await users.send('confirmFrom', [hexAddress, object])
+      const { txid } = await users.send('confirmFrom', [hexAddress, link])
 
-      res.json({ user, address, hexAddress, object, txid })
+      res.json({ user, address, hexAddress, link, txid })
     } catch (e) {
       console.error(e)
       res.sendStatus(500)
@@ -85,7 +85,7 @@ export default ({ fb, feed, users, achievements, rewards }) => {
 
   app.post('/create', async (req, res) => {
     try {
-      const { user, token, address, object, contentHash, title } = req.body
+      const { user, token, address, link, title, previousLink } = req.body
 
       if (!isAddress(address)) {
         return res.status(400).json({ error: 'INVALID_ADDRESS' })
@@ -95,10 +95,18 @@ export default ({ fb, feed, users, achievements, rewards }) => {
         return res.status(400).json({ error: 'INVALID_TOKEN' })
       }
 
+      const contentHash = toContentHash(link)
       const hexAddress = toHexAddress(address)
-      const { txid } = await achievements.send('createFrom', [hexAddress, object, contentHash, title])
 
-      res.json({ user, address, hexAddress, object, contentHash, title, txid })
+      let args = [hexAddress, link, contentHash, title]
+
+      if (previousLink) {
+        args.push(previousLink)
+      }
+
+      const { txid } = await achievements.send('createFrom', args)
+
+      res.json({ user, address, hexAddress, link, title, previousLink, txid, contentHash })
     } catch (e) {
       console.error(e)
       res.sendStatus(500)
@@ -107,16 +115,16 @@ export default ({ fb, feed, users, achievements, rewards }) => {
 
   app.post('/withdraw', async (req, res) => {
     try {
-      const { object, witness } = req.body
+      const { link, witness } = req.body
 
       if (!isAddress(witness)) {
         return res.status(400).json({ error: 'INVALID_ADDRESS' })
       }
 
       const hexWitness = toHexAddress(witness)
-      const { txid } = await rewards.send('withdraw', [object, hexWitness])
+      const { txid } = await rewards.send('withdraw', [link, hexWitness])
 
-      res.json({ txid, object, witness, hexWitness })
+      res.json({ txid, link, witness, hexWitness })
     } catch (e) {
       console.error(e)
       res.sendStatus(500)
