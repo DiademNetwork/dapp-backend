@@ -4,7 +4,7 @@ const stream = require('getstream')
 const p = require('lorem-ipsum')
 
 const client = stream.connect(process.env.STREAM_KEY, process.env.STREAM_SECRET, process.env.STREAM_APPID)
-const feed = client.feed(process.env.STREAM_FEED, 'common')
+const feed = client.feed(process.env.STREAM_ACHIEVEMENTS_GROUP, process.env.STREAM_ACHIEVEMENTS_FEED)
 
 let activities = []
 
