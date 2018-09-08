@@ -37,7 +37,7 @@ describe('Feeds', () => {
 
   beforeAll(async () => {
     client = stream.connect(process.env.STREAM_KEY, process.env.STREAM_SECRET, process.env.STREAM_APPID, { browser: false })
-    feed = client.feed(process.env.STREAM_FEED, 'common')
+    feed = client.feed(process.env.STREAM_TRANSACTIONS_GROUP, process.env.STREAM_TRANSACTIONS_FEED)
     response = await feed.get()
     results = response.results
   })

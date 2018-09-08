@@ -24,7 +24,7 @@ const toHexAddress = (address) => {
 
 const toContentHash = (link) => {
   // todo: retrive content by link and return hash from content
-  return link
+  return "0x341f85f5eca6304166fcfb6f591d49f6019f23fa39be0615e6417da06bf747ce"
 }
 
 export {
