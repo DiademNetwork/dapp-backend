@@ -28,7 +28,7 @@ export default ({ fb, feed, users, achievements, rewards }) => {
       }
     } catch (error) {
       console.error(error)
-      res.sendStatus(500)
+      res.status(500).send({ error: error.toString() })
     }
   })
 
@@ -37,11 +37,11 @@ export default ({ fb, feed, users, achievements, rewards }) => {
       const { address, user, token } = req.body
 
       if (!isAddress(address)) {
-        return res.status(400).json({ error: 'INVALID_ADDRESS' })
+        return res.status(500).json({ error: 'INVALID_ADDRESS' })
       }
 
       if (!isAccountOwner(fb, user, token)) {
-        return res.status(400).json({ error: 'INVALID_TOKEN' })
+        return res.status(500).json({ error: 'INVALID_TOKEN' })
       }
 
       const hexAddress = toHexAddress(address)
@@ -49,7 +49,7 @@ export default ({ fb, feed, users, achievements, rewards }) => {
       const userExists = (await users.call('exists', [hexAddress])).outputs[0]
 
       if (userExists) {
-        return res.status(400).json({ error: 'USER_EXISTS' })
+        return res.status(500).json({ error: 'USER_EXISTS' })
       }
 
       const { txid } = await users.send('register', [hexAddress, user])
@@ -64,7 +64,7 @@ export default ({ fb, feed, users, achievements, rewards }) => {
       res.json({ user, address, hexAddress, txid })
     } catch (e) {
       console.error(e)
-      res.sendStatus(500)
+      res.status(500).send({ error: e.toString() })
     }
   })
 
@@ -73,11 +73,11 @@ export default ({ fb, feed, users, achievements, rewards }) => {
       const { address, user, token, link } = req.body
 
       if (!isAddress(address)) {
-        return res.status(400).json({ error: 'INVALID_ADDRESS ' })
+        return res.status(500).json({ error: 'INVALID_ADDRESS ' })
       }
 
       if (!isAccountOwner(fb, user, token)) {
-        return res.status(400).json({ error: 'INVALID_TOKEN' })
+        return res.status(500).json({ error: 'INVALID_TOKEN' })
       }
 
       const hexAddress = toHexAddress(address)
@@ -93,7 +93,7 @@ export default ({ fb, feed, users, achievements, rewards }) => {
       res.json({ user, address, hexAddress, link, txid })
     } catch (e) {
       console.error(e)
-      res.sendStatus(500)
+      res.status(500).send({ error: e.toString() })
     }
   })
 
@@ -102,11 +102,11 @@ export default ({ fb, feed, users, achievements, rewards }) => {
       const { user, token, address, link, title, previousLink } = req.body
 
       if (!isAddress(address)) {
-        return res.status(400).json({ error: 'INVALID_ADDRESS' })
+        return res.status(500).json({ error: 'INVALID_ADDRESS' })
       }
 
       if (!isAccountOwner(fb, user, token)) {
-        return res.status(400).json({ error: 'INVALID_TOKEN' })
+        return res.status(500).json({ error: 'INVALID_TOKEN' })
       }
 
       const contentHash = toContentHash(link)
@@ -130,7 +130,7 @@ export default ({ fb, feed, users, achievements, rewards }) => {
       res.json({ user, address, hexAddress, link, title, previousLink, txid, contentHash })
     } catch (e) {
       console.error(e)
-      res.sendStatus(500)
+      res.sendStatus(500).send({ error: e.toString() })
     }
   })
 
@@ -139,7 +139,7 @@ export default ({ fb, feed, users, achievements, rewards }) => {
       const { link, witness } = req.body
 
       if (!isAddress(witness)) {
-        return res.status(400).json({ error: 'INVALID_ADDRESS' })
+        return res.status(500).json({ error: 'INVALID_ADDRESS' })
       }
 
       const hexWitness = toHexAddress(witness)
@@ -155,7 +155,7 @@ export default ({ fb, feed, users, achievements, rewards }) => {
       res.json({ txid, link, witness, hexWitness })
     } catch (e) {
       console.error(e)
-      res.sendStatus(500)
+      res.status(500).send({ error: e.toString() })
     }
   })
 
