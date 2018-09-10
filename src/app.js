@@ -70,16 +70,15 @@ export default ({ fb, feed, users, achievements, rewards }) => {
 
   app.post('/confirm', async (req, res) => {
     try {
-      const {address, user, token, link} = req.body
+      const { address, user, token, link } = req.body
 
       if (!isAddress(address)) {
-        return res.status(500).json({error: 'INVALID_ADDRESS '})
+        return res.status(500).json({ error: 'INVALID_ADDRESS ' })
       }
 
       if (!isAccountOwner(fb, user, token)) {
-        return res.status(500).json({error: 'INVALID_TOKEN'})
+        return res.status(500).json({ error: 'INVALID_TOKEN' })
       }
-
 
       const hexAddress = toHexAddress(address)
 
@@ -87,7 +86,7 @@ export default ({ fb, feed, users, achievements, rewards }) => {
         return res.status(500).json({ error: 'INVALID_ADDRESS_OWNER' })
       }
 
-      const {txid} = await users.send('confirmFrom', [hexAddress, link])
+      const { txid } = await achievements.send('confirmFrom', [hexAddress, link])
 
       await feed.addActivity({
         actor: user,
@@ -96,10 +95,10 @@ export default ({ fb, feed, users, achievements, rewards }) => {
         verb: 'confirm'
       })
 
-      res.json({user, address, hexAddress, link, txid})
+      res.json({ user, address, hexAddress, link, txid })
     } catch (e) {
       console.error(e)
-      res.status(500).send({error: e.toString()})
+      res.status(500).send({ error: e.toString() })
     }
   })
 
