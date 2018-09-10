@@ -15,6 +15,12 @@ const isAccountOwner = async (fb, user, token) => {
   }
 }
 
+const isAddressOwner = async (users, address, account) => {
+  const addressOwner = (await users.call('getAccountByAddress', [address])).outputs[0]
+
+  return addressOwner === address
+}
+
 const toHexAddress = (address) => {
   const bytes = bs58.decode(address)
   const hexAddress = bytes.toString('hex').slice(2, 42)
@@ -30,6 +36,7 @@ const toContentHash = (link) => {
 export {
   isAddress,
   isAccountOwner,
+  isAddressOwner,
   toHexAddress,
   toContentHash
 }
