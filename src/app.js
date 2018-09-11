@@ -2,7 +2,7 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import { isAddress, isAccountOwner, isAddressOwner, toHexAddress, toContentHash } from './helpers'
 
-export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall, depositMethodABI, supportMethodABI, options }) => {
+export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall, token, depositMethodABI, supportMethodABI, options }) => {
   const app = express()
   app.use(bodyParser())
 
@@ -26,6 +26,33 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
       } else {
         return res.json({ exists: false })
       }
+    } catch (error) {
+      console.error(error)
+      res.status(500).send({ error: error.toString() })
+    }
+  })
+
+  app.post('/getAccessToken', async (req, res) => {
+    try {
+      const { address, user, token } = req.body
+
+      if (!isAddress(address)) {
+        return res.status(500).json({ error: 'INVALID_ADDRESS ' })
+      }
+
+      if (!isAccountOwner(fb, user, token)) {
+        return res.status(500).json({ error: 'INVALID_TOKEN' })
+      }
+
+      const hexAddress = toHexAddress(address)
+
+      if (!isAddressOwner(users, hexAddress, user)) {
+        return res.status(500).json({ error: 'INVALID_ADDRESS_OWNER' })
+      }
+
+      const accessToken = token(address)
+
+      res.json({ accessToken: accessToken, address, user })
     } catch (error) {
       console.error(error)
       res.status(500).send({ error: error.toString() })

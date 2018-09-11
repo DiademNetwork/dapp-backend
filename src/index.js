@@ -22,6 +22,12 @@ const depositMethodABI = qtumRepository.contracts['contracts/Rewards.sol'].abi.f
 const client = stream.connect(process.env.STREAM_KEY, process.env.STREAM_SECRET)
 const feed = client.feed(process.env.STREAM_TRANSACTIONS_GROUP, process.env.STREAM_TRANSACTIONS_FEED)
 
+const token = (wallet) => {
+  const feed = client.feed(process.env.STREAM_TRANSACTIONS_GROUP, wallet)
+
+  return feed.getReadOnlyToken()
+}
+
 const port = process.env.APP_PORT || 3000
 
 const options = {
@@ -29,7 +35,7 @@ const options = {
 }
 
 app({
-  fb, feed, users, achievements, rewards, encodeMethod, rawCall, supportMethodABI, depositMethodABI, options
+  fb, feed, users, achievements, rewards, encodeMethod, rawCall, token, supportMethodABI, depositMethodABI, options
 }).listen(port, () => {
   console.log(`Running on :${port}\n`)
 })
