@@ -15,7 +15,7 @@ const users = qtum.contract('contracts/Users.sol')
 const achievements = qtum.contract('contracts/Achievements.sol')
 const rewards = qtum.contract('contracts/Rewards.sol')
 
-const encodeMethod = qtum.encodeMethod
+const { encodeMethod, rawCall } = qtum
 const supportMethodABI = qtumRepository.contracts['contracts/Rewards.sol'].abi.find(method => method.name === 'support')
 const depositMethodABI = qtumRepository.contracts['contracts/Rewards.sol'].abi.find(method => method.name === 'deposit')
 
@@ -29,7 +29,7 @@ const options = {
 }
 
 app({
-  fb, feed, users, achievements, rewards, encodeMethod, supportMethodABI, depositMethodABI, options
+  fb, feed, users, achievements, rewards, encodeMethod, rawCall, supportMethodABI, depositMethodABI, options
 }).listen(port, () => {
   console.log(`Running on :${port}\n`)
 })

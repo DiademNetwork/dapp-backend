@@ -2,7 +2,7 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import { isAddress, isAccountOwner, isAddressOwner, toHexAddress, toContentHash } from './helpers'
 
-export default ({ fb, feed, users, achievements, rewards, encodeMethod, depositMethodABI, supportMethodABI, options }) => {
+export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall, depositMethodABI, supportMethodABI, options }) => {
   const app = express()
   app.use(bodyParser())
 
@@ -193,6 +193,75 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, depositM
       const encodedData = encodeMethod(depositMethodABI, [link, witnessAddress], options)
 
       res.json({ encodedData })
+    } catch (e) {
+      console.error(e)
+      res.status(500).send({ error: e.toString() })
+    }
+  })
+
+  app.post('/support', async (req, res) => {
+    try {
+      const { rawTx, link, address, user, token } = req.body
+
+      if (!isAddress(address)) {
+        return res.status(500).json({ error: 'INVALID_ADDRESS' })
+      }
+
+      if (!isAccountOwner(fb, user, token)) {
+        return res.status(500).json({ error: 'INVALID_TOKEN' })
+      }
+
+      const hexAddress = toHexAddress(address)
+
+      if (!isAddressOwner(users, hexAddress, user)) {
+        return res.status(500).json({ error: 'INVALID_ADDRESS_OWNER' })
+      }
+
+      const { txid } = await rawCall('sendrawtransaction', [rawTx])
+
+      await feed.addActivity({
+        actor: address,
+        object: link,
+        target: txid,
+        verb: 'support'
+      })
+
+      res.json({ txid })
+    } catch (e) {
+      console.error(e)
+      res.status(500).send({ error: e.toString() })
+    }
+  })
+
+  app.post('/deposit', async (req, res) => {
+    try {
+      const { rawTx, link, witness, address, user, token } = req.body
+
+      if (!isAddress(address)) {
+        return res.status(500).json({ error: 'INVALID_ADDRESS' })
+      }
+
+      if (!isAccountOwner(fb, user, token)) {
+        return res.status(500).json({ error: 'INVALID_TOKEN' })
+      }
+
+      const hexAddress = toHexAddress(address)
+
+      if (!isAddressOwner(users, hexAddress, user)) {
+        return res.status(500).json({ error: 'INVALID_ADDRESS_OWNER' })
+      }
+
+      const { txid } = await rawCall('sendrawtransaction', [rawTx])
+
+      await feed.addActivity({
+        actor: address,
+        object: link,
+        witness: witness,
+        target: txid,
+        verb: 'support'
+      })
+
+      res.json({ txid })
     } catch (e) {
       console.error(e)
       res.status(500).send({ error: e.toString() })
