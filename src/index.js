@@ -23,8 +23,13 @@ const client = stream.connect(process.env.STREAM_KEY, process.env.STREAM_SECRET)
 const feed = client.feed(process.env.STREAM_TRANSACTIONS_GROUP, process.env.STREAM_TRANSACTIONS_FEED)
 
 const port = process.env.APP_PORT || 3000
+
+const options = {
+  senderAddress: process.env.SENDER_ADDRESS
+}
+
 app({
-  fb, feed, users, achievements, rewards, encodeMethod, supportMethodABI, depositMethodABI
+  fb, feed, users, achievements, rewards, encodeMethod, supportMethodABI, depositMethodABI, options
 }).listen(port, () => {
   console.log(`Running on :${port}\n`)
 })

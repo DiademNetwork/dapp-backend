@@ -2,7 +2,7 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import { isAddress, isAccountOwner, isAddressOwner, toHexAddress, toContentHash } from './helpers'
 
-export default ({ fb, feed, users, achievements, rewards, encodeMethod, depositMethodABI, supportMethodABI }) => {
+export default ({ fb, feed, users, achievements, rewards, encodeMethod, depositMethodABI, supportMethodABI, options }) => {
   const app = express()
   app.use(bodyParser())
 
@@ -52,7 +52,7 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, depositM
         return res.status(500).json({ error: 'USER_EXISTS' })
       }
 
-      const { txid } = await users.send('register', [hexAddress, user])
+      const { txid } = await users.send('register', [hexAddress, user], options)
 
       await feed.addActivity({
         actor: user,
@@ -86,7 +86,7 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, depositM
         return res.status(500).json({ error: 'INVALID_ADDRESS_OWNER' })
       }
 
-      const { txid } = await achievements.send('confirmFrom', [hexAddress, link])
+      const { txid } = await achievements.send('confirmFrom', [hexAddress, link], options)
 
       await feed.addActivity({
         actor: user,
@@ -128,7 +128,7 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, depositM
         args.push(previousLink)
       }
 
-      const { txid } = await achievements.send('createFrom', args)
+      const { txid } = await achievements.send('createFrom', args, options)
 
       const verb = previousLink ? 'update' : 'create'
 
@@ -155,7 +155,7 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, depositM
       }
 
       const hexWitness = toHexAddress(witness)
-      const { txid } = await rewards.send('withdraw', [link, hexWitness])
+      const { txid } = await rewards.send('withdraw', [link, hexWitness], options)
 
       await feed.addActivity({
         actor: witness,
@@ -175,7 +175,7 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, depositM
     try {
       const { link } = req.body
 
-      const encodedData = encodeMethod(supportMethodABI, [link])
+      const encodedData = encodeMethod(supportMethodABI, [link], options)
 
       res.status(500).json({ encodedData })
     } catch (e) {
@@ -190,7 +190,7 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, depositM
 
       const witnessAddress = (await users.call('getAddressByAccount', [witness])).outputs[0]
 
-      const encodedData = encodeMethod(depositMethodABI, [link, witnessAddress])
+      const encodedData = encodeMethod(depositMethodABI, [link, witnessAddress], options)
 
       res.json({ encodedData })
     } catch (e) {
