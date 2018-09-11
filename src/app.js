@@ -1,6 +1,6 @@
 import express from 'express'
 import bodyParser from 'body-parser'
-import { isAddress, isAccountOwner, isAddressOwner, toHexAddress, toContentHash } from './helpers'
+import { isAddress, isAccountOwner, isAddressOwner, toHexAddress, toContentHash, toUserProfileName } from './helpers'
 
 export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall, token, depositMethodABI, supportMethodABI, options }) => {
   const app = express()
@@ -81,14 +81,17 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
 
       const { txid } = await users.send('register', [hexAddress, user], options)
 
+      const userProfileName = await toUserProfileName(fb, user)
+
       await feed.addActivity({
         actor: user,
         object: address,
         target: txid,
+        name: userProfileName,
         verb: 'register'
       })
 
-      res.json({ user, address, hexAddress, txid })
+      res.json({ user, address, hexAddress, userProfileName, txid })
     } catch (e) {
       console.error(e)
       res.status(500).send({ error: e.toString() })
@@ -115,14 +118,17 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
 
       const { txid } = await achievements.send('confirmFrom', [hexAddress, link], options)
 
+      const userProfileName = await toUserProfileName(fb, user)
+
       await feed.addActivity({
         actor: user,
         object: link,
         target: txid,
+        name: userProfileName,
         verb: 'confirm'
       })
 
-      res.json({ user, address, hexAddress, link, txid })
+      res.json({ user, address, hexAddress, link, userProfileName, txid })
     } catch (e) {
       console.error(e)
       res.status(500).send({ error: e.toString() })
@@ -159,14 +165,17 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
 
       const verb = previousLink ? 'update' : 'create'
 
+      const userProfileName = await toUserProfileName(fb, user)
+
       await feed.addActivity({
         actor: user,
         object: link,
         target: txid,
-        verb: verb
+        verb: verb,
+        name: userProfileName
       })
 
-      res.json({ user, address, hexAddress, link, title, previousLink, txid, contentHash })
+      res.json({ user, address, hexAddress, link, title, previousLink, txid, userProfileName, contentHash })
     } catch (e) {
       console.error(e)
       res.sendStatus(500).send({ error: e.toString() })
@@ -246,14 +255,17 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
 
       const { txid } = await rawCall('sendrawtransaction', [rawTx])
 
+      const userProfileName = await toUserProfileName(fb, user)
+
       await feed.addActivity({
         actor: address,
         object: link,
         target: txid,
+        name: userProfileName,
         verb: 'support'
       })
 
-      res.json({ txid })
+      res.json({ txid, link, address, userProfileName, user })
     } catch (e) {
       console.error(e)
       res.status(500).send({ error: e.toString() })
@@ -280,15 +292,18 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
 
       const { txid } = await rawCall('sendrawtransaction', [rawTx])
 
+      const userProfileName = await toUserProfileName(fb, user)
+
       await feed.addActivity({
         actor: address,
         object: link,
         witness: witness,
         target: txid,
+        name: userProfileName,
         verb: 'support'
       })
 
-      res.json({ txid })
+      res.json({ txid, link, witness, address, userProfileName, user })
     } catch (e) {
       console.error(e)
       res.status(500).send({ error: e.toString() })

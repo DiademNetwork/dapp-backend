@@ -1,3 +1,4 @@
+/* eslint-disable no-trailing-spaces */
 import { Address } from 'qtumcore-lib'
 import bs58 from 'bs58'
 
@@ -35,10 +36,17 @@ const toContentHash = (link) => {
   return '0x341f85f5eca6304166fcfb6f591d49f6019f23fa39be0615e6417da06bf747ce'
 }
 
+const toUserProfileName = async (fb, user) => {
+  const userProfile = await fb.api(`/${user}/`)
+
+  return userProfile.name
+}
+
 export {
   isAddress,
   isAccountOwner,
   isAddressOwner,
   toHexAddress,
-  toContentHash
+  toContentHash,
+  toUserProfileName
 }
