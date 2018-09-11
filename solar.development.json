@@ -471,12 +471,12 @@
       "binhash": "fff36ef3431f3f0824e9cf3c7200747463fbf434e59ee4e42b694a70994f8c07",
       "name": "Achievements",
       "deployName": "contracts/Achievements.sol",
-      "address": "a9a54d6028f7b740d0c2256a6ce197bcd0269b27",
-      "txid": "6e93b20197ac591fd97f20a3ae45df37878dc328dc96ad048d4db53e7c1f91d1",
-      "createdAt": "2018-09-10T23:04:44.540406624+03:00",
+      "address": "0c76588009ecf0eb9bfa15798315a4e42281df8a",
+      "txid": "4fec45d29df13bc5ee6002cfd8b3366d0f28f2468ca2e3ff5a812a917e1ca4cd",
+      "createdAt": "2018-09-11T14:52:20.440792273+03:00",
       "confirmed": true,
-      "sender": "qdfSVAWSZ22RsTphLRgJs6jt43tEvwYGgN",
-      "senderHex": "dc87ca8540d94543c0667f975126d2411c49d023"
+      "sender": "qHhxaVtraxMZijiPzn9xQM3EAxp3XDkvTQ",
+      "senderHex": "019f3a132eb74abb6aa028fb36d60568cbff4ece"
     },
     "contracts/Rewards.sol": {
       "source": "contracts/Rewards.sol:Rewards",
@@ -748,12 +748,12 @@
       "binhash": "5fe75bfdac159e9583ae6cabed07a0b7a1bc76f4b20d863269a20f4e0eb4e74c",
       "name": "Rewards",
       "deployName": "contracts/Rewards.sol",
-      "address": "ffbdee49a46ad602466fb235269d6bb21fd4b915",
-      "txid": "247a62d654593d4acc5272722e39d59aa28acfa09ee77a036b69c459cf8c0186",
-      "createdAt": "2018-09-10T23:05:02.263519518+03:00",
+      "address": "0d1266b84a6c9ab66b1d1d6bed0cbe34bf35ea45",
+      "txid": "d3472e5ed296d914a0120bf0e7f5a368218af48490233de9a675b6c635c39054",
+      "createdAt": "2018-09-11T15:02:15.205745921+03:00",
       "confirmed": true,
-      "sender": "qdfSVAWSZ22RsTphLRgJs6jt43tEvwYGgN",
-      "senderHex": "dc87ca8540d94543c0667f975126d2411c49d023"
+      "sender": "qSfDRWcszMgJoevYkWyNzLkdgvNUWUUHQb",
+      "senderHex": "63d380c7565e41417443246e3113ffa448911bd1"
     },
     "contracts/Users.sol": {
       "source": "contracts/Users.sol:Users",
@@ -902,12 +902,12 @@
       "binhash": "fc337b28fcd072f535262ed398f3db69e68cd422338d435f7e3060871cb494e1",
       "name": "Users",
       "deployName": "contracts/Users.sol",
-      "address": "93fb06c7e30a99a0ecd5cb3b2b320d9b8f79ce04",
-      "txid": "fcf5dc5cf930438b8f7e6e7d12b8254ba7e499c131c8d518e0b181fd5d1b92f0",
-      "createdAt": "2018-09-10T23:02:02.477562741+03:00",
+      "address": "b9287ca160ac125808595aa71987138f3489d2b2",
+      "txid": "10d50e612846195e109e5f84d6d2c46fc0a0d61853df6708bd2bc73a9d05ae7f",
+      "createdAt": "2018-09-11T14:47:57.307419736+03:00",
       "confirmed": true,
-      "sender": "qYfhhu8PwQk7ekeEosX9qk9ZczPVxbrKbY",
-      "senderHex": "a5bbdde89ef409b0434845ed151132b2cc55a493"
+      "sender": "qRjRfvwxeFxNi7oggJFXtURJuLe2M9tFVy",
+      "senderHex": "59a74406f1de203725eaaa01fb208ffec3679757"
     }
   },
   "libraries": {},
