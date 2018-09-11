@@ -169,11 +169,7 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
 
       const contentHash = toContentHash(link)
 
-      let args = [hexAddress, link, contentHash, title]
-
-      if (previousLink) {
-        args.push(previousLink)
-      }
+      let args = [hexAddress, link, contentHash, title, previousLink]
 
       const transaction = await achievements.send('createFrom', args, options)
 
