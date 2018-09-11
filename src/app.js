@@ -6,6 +6,8 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
   const app = express()
   app.use(bodyParser())
 
+  const transactionsPending = {}
+
   app.use((req, res, next) => {
     console.log(req.body)
     next()
@@ -19,10 +21,14 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
     try {
       const { user } = req.body
 
+      if (transactionsPending[user] === true) {
+        return res.json({ exists: false, pending: true })
+      }
+
       const account = (await users.call('accountExists', [user])).outputs[0]
 
       if (account) {
-        return res.json({ exists: true, account })
+        return res.json({ exists: true })
       } else {
         return res.json({ exists: false })
       }
@@ -79,7 +85,9 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
         return res.status(500).json({ error: 'USER_EXISTS' })
       }
 
-      const { txid } = await users.send('register', [hexAddress, user], options)
+      const transaction = await users.send('register', [hexAddress, user], options)
+
+      const { txid } = transaction
 
       const userProfileName = await toUserProfileName(fb, user)
 
@@ -92,6 +100,10 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
       })
 
       res.json({ user, address, hexAddress, userProfileName, txid })
+
+      transactionsPending[user] = true
+      await transaction.confirm(1)
+      transactionsPending[user] = false
     } catch (e) {
       console.error(e)
       res.status(500).send({ error: e.toString() })
@@ -116,7 +128,9 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
         return res.status(500).json({ error: 'INVALID_ADDRESS_OWNER' })
       }
 
-      const { txid } = await achievements.send('confirmFrom', [hexAddress, link], options)
+      const transaction = await achievements.send('confirmFrom', [hexAddress, link], options)
+
+      const { txid } = transaction
 
       const userProfileName = await toUserProfileName(fb, user)
 
@@ -161,7 +175,9 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
         args.push(previousLink)
       }
 
-      const { txid } = await achievements.send('createFrom', args, options)
+      const transaction = await achievements.send('createFrom', args, options)
+
+      const { txid } = transaction
 
       const verb = previousLink ? 'update' : 'create'
 
