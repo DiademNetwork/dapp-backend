@@ -18,7 +18,7 @@ const isAccountOwner = async (fb, user, token) => {
 const isAddressOwner = async (users, address, account) => {
   const addressOwner = (await users.call('getAccountByAddress', [address])).outputs[0]
 
-  return addressOwner === address
+  return addressOwner === account
 }
 
 const toHexAddress = (address) => {

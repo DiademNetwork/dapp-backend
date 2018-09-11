@@ -2,7 +2,7 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import { isAddress, isAccountOwner, isAddressOwner, toHexAddress, toContentHash } from './helpers'
 
-export default ({ fb, feed, users, achievements, rewards }) => {
+export default ({ fb, feed, users, achievements, rewards, encodeMethod, depositMethodABI, supportMethodABI }) => {
   const app = express()
   app.use(bodyParser())
 
@@ -130,11 +130,13 @@ export default ({ fb, feed, users, achievements, rewards }) => {
 
       const { txid } = await achievements.send('createFrom', args)
 
+      const verb = previousLink ? 'update' : 'create'
+
       await feed.addActivity({
         actor: user,
         object: link,
         target: txid,
-        verb: 'create'
+        verb: verb
       })
 
       res.json({ user, address, hexAddress, link, title, previousLink, txid, contentHash })
@@ -163,6 +165,34 @@ export default ({ fb, feed, users, achievements, rewards }) => {
       })
 
       res.json({ txid, link, witness, hexWitness })
+    } catch (e) {
+      console.error(e)
+      res.status(500).send({ error: e.toString() })
+    }
+  })
+
+  app.post('/encodeSupport', async (req, res) => {
+    try {
+      const { link } = req.body
+
+      const encodedData = encodeMethod(supportMethodABI, [link])
+
+      res.status(500).json({ encodedData })
+    } catch (e) {
+      console.error(e)
+      res.status(500).send({ error: e.toString() })
+    }
+  })
+
+  app.post('/encodeDeposit', async (req, res) => {
+    try {
+      const { link, witness } = req.body
+
+      const witnessAddress = (await users.call('getAddressByAccount', [witness])).outputs[0]
+
+      const encodedData = encodeMethod(depositMethodABI, [link, witnessAddress])
+
+      res.json({ encodedData })
     } catch (e) {
       console.error(e)
       res.status(500).send({ error: e.toString() })
