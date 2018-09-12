@@ -1,5 +1,5 @@
 /* eslint-disable no-trailing-spaces */
-import { Address } from 'qtumcore-lib'
+import { Address, crypto } from 'qtumcore-lib'
 import bs58 from 'bs58'
 
 const isAddress = (address) => {
@@ -32,8 +32,8 @@ const toHexAddress = (address) => {
 }
 
 const toContentHash = (link) => {
-  // todo: retrive content by link and return hash from content
-  return '0x341f85f5eca6304166fcfb6f591d49f6019f23fa39be0615e6417da06bf747ce'
+  // todo: retrive content by link and return hash from content (when app will be approved by facebook)
+  return crypto.Hash.sha256(Buffer.from(link)).toString('hex')
 }
 
 const toUserProfileName = async (fb, user) => {
