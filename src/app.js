@@ -9,7 +9,7 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
   const transactionsPending = {}
 
   app.use((req, res, next) => {
-    console.log(req.body)
+    console.log('request', req.body)
     next()
   })
 
@@ -87,7 +87,11 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
 
       const userProfileName = await toUserProfileName(fb, user)
 
-      const transaction = await users.send('register', [hexAddress, user, userProfileName], options)
+      const args = [hexAddress, user, userProfileName]
+
+      console.log('register', args)
+
+      const transaction = await users.send('register', args, options)
 
       const { txid } = transaction
 
@@ -128,7 +132,11 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
         return res.status(500).json({ error: 'INVALID_ADDRESS_OWNER' })
       }
 
-      const transaction = await achievements.send('confirmFrom', [hexAddress, link], options)
+      const args = [hexAddress, link]
+
+      console.log('confirmFrom', args)
+
+      const transaction = await achievements.send('confirmFrom', args, options)
 
       const { txid } = transaction
 
@@ -171,6 +179,8 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
 
       let args = [hexAddress, link, contentHash, title, previousLink]
 
+      console.log('create', args)
+
       const transaction = await achievements.send('createFrom', args, options)
 
       const { txid } = transaction
@@ -203,7 +213,12 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
       }
 
       const hexWitness = toHexAddress(witness)
-      const { txid } = await rewards.send('withdraw', [link, hexWitness], options)
+
+      const args = [link, hexWitness]
+
+      console.log('withdraw', args)
+
+      const { txid } = await rewards.send('withdraw', args, options)
 
       await feed.addActivity({
         actor: witness,
