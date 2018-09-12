@@ -85,11 +85,11 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
         return res.status(500).json({ error: 'USER_EXISTS' })
       }
 
-      const transaction = await users.send('register', [hexAddress, user], options)
+      const userProfileName = await toUserProfileName(fb, user)
+
+      const transaction = await users.send('register', [hexAddress, user, userProfileName], options)
 
       const { txid } = transaction
-
-      const userProfileName = await toUserProfileName(fb, user)
 
       await feed.addActivity({
         actor: user,
