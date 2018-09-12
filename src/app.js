@@ -52,7 +52,9 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
 
       const hexAddress = toHexAddress(address)
 
-      if (!isAddressOwner(users, hexAddress, user)) {
+      const checkedAddressOwner = await isAddressOwner(users, hexAddress, user)
+
+      if (!checkedAddressOwner) {
         return res.status(500).json({ error: 'INVALID_ADDRESS_OWNER' })
       }
 
@@ -128,7 +130,9 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
 
       const hexAddress = toHexAddress(address)
 
-      if (!isAddressOwner(users, hexAddress, user)) {
+      const checkedAddressOwner = await isAddressOwner(users, hexAddress, user)
+
+      if (!checkedAddressOwner) {
         return res.status(500).json({ error: 'INVALID_ADDRESS_OWNER' })
       }
 
@@ -171,7 +175,9 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
 
       const hexAddress = toHexAddress(address)
 
-      if (!isAddressOwner(users, hexAddress, user)) {
+      const checkedAddressOwner = await isAddressOwner(users, hexAddress, user)
+
+      if (!checkedAddressOwner) {
         return res.status(500).json({ error: 'INVALID_ADDRESS_OWNER' })
       }
 
@@ -276,7 +282,9 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
 
       const hexAddress = toHexAddress(address)
 
-      if (!isAddressOwner(users, hexAddress, user)) {
+      const checkedAddressOwner = await isAddressOwner(users, hexAddress, user)
+
+      if (!checkedAddressOwner) {
         return res.status(500).json({ error: 'INVALID_ADDRESS_OWNER' })
       }
 
@@ -313,7 +321,9 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
 
       const hexAddress = toHexAddress(address)
 
-      if (!isAddressOwner(users, hexAddress, user)) {
+      const checkedAddressOwner = await isAddressOwner(users, hexAddress, user)
+
+      if (!checkedAddressOwner) {
         return res.status(500).json({ error: 'INVALID_ADDRESS_OWNER' })
       }
 
