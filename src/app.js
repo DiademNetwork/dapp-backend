@@ -2,7 +2,7 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import { isAddress, isAccountOwner, isAddressOwner, toContentHash, toUserProfileName } from './helpers'
 
-export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall, getHexAddress, token, depositMethodABI, supportMethodABI, options }) => {
+export default ({ fb, feed, users, achievements, rewards, qtum, token, depositMethodABI, supportMethodABI, options }) => {
   const app = express()
   app.use(bodyParser())
 
@@ -72,7 +72,7 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
         return res.status(500).json({ error: 'INVALID_TOKEN' })
       }
 
-      const hexAddress = await getHexAddress(address)
+      const hexAddress = await qtum.getHexAddress(address)
 
       const checkedAddressOwner = await isAddressOwner(users, hexAddress, user)
 
@@ -101,7 +101,7 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
         return res.status(500).json({ error: 'INVALID_TOKEN' })
       }
 
-      const hexAddress = await getHexAddress(address)
+      const hexAddress = await qtum.getHexAddress(address)
 
       const userExists = (await users.call('exists', [hexAddress])).outputs[0]
 
@@ -150,7 +150,7 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
         return res.status(500).json({ error: 'INVALID_TOKEN' })
       }
 
-      const hexAddress = await getHexAddress(address)
+      const hexAddress = await qtum.getHexAddress(address)
 
       const checkedAddressOwner = await isAddressOwner(users, hexAddress, user)
 
@@ -195,7 +195,7 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
         return res.status(500).json({ error: 'INVALID_TOKEN' })
       }
 
-      const hexAddress = await getHexAddress(address)
+      const hexAddress = await qtum.getHexAddress(address)
 
       const checkedAddressOwner = await isAddressOwner(users, hexAddress, user)
 
@@ -240,7 +240,7 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
         return res.status(500).json({ error: 'INVALID_ADDRESS' })
       }
 
-      const hexWitness = await getHexAddress(witness)
+      const hexWitness = await qtum.getHexAddress(witness)
 
       const args = [link, hexWitness]
 
@@ -266,7 +266,7 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
     try {
       const { link } = req.body
 
-      const encodedData = encodeMethod(supportMethodABI, [link], options)
+      const encodedData = await qtum.encodeMethod(supportMethodABI, [link], options)
 
       res.status(500).json({ encodedData })
     } catch (e) {
@@ -281,7 +281,7 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
 
       const witnessAddress = (await users.call('getAddressByAccount', [witness])).outputs[0]
 
-      const encodedData = encodeMethod(depositMethodABI, [link, witnessAddress], options)
+      const encodedData = await qtum.encodeMethod(depositMethodABI, [link, witnessAddress], options)
 
       res.json({ encodedData })
     } catch (e) {
@@ -302,7 +302,7 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
         return res.status(500).json({ error: 'INVALID_TOKEN' })
       }
 
-      const hexAddress = await getHexAddress(address)
+      const hexAddress = await qtum.getHexAddress(address)
 
       const checkedAddressOwner = await isAddressOwner(users, hexAddress, user)
 
@@ -310,7 +310,7 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
         return res.status(500).json({ error: 'INVALID_ADDRESS_OWNER' })
       }
 
-      const { txid } = await rawCall('sendrawtransaction', [rawTx])
+      const { txid } = await qtum.rawCall('sendrawtransaction', [rawTx])
 
       const userProfileName = await toUserProfileName(fb, user)
 
@@ -341,7 +341,7 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
         return res.status(500).json({ error: 'INVALID_TOKEN' })
       }
 
-      const hexAddress = await getHexAddress(address)
+      const hexAddress = await qtum.getHexAddress(address)
 
       const checkedAddressOwner = await isAddressOwner(users, hexAddress, user)
 
@@ -349,7 +349,7 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
         return res.status(500).json({ error: 'INVALID_ADDRESS_OWNER' })
       }
 
-      const { txid } = await rawCall('sendrawtransaction', [rawTx])
+      const { txid } = await qtum.rawCall('sendrawtransaction', [rawTx])
 
       const userProfileName = await toUserProfileName(fb, user)
 

@@ -11,11 +11,11 @@ const fb = new Facebook({ accessToken: process.env.FACEBOOK_ACCESS_TOKEN })
 
 const qtumRepository = require('../solar.development.json')
 const qtum = new Qtum(process.env.QTUM_RPC_ADDRESS, qtumRepository)
+
 const users = qtum.contract('contracts/Users.sol')
 const achievements = qtum.contract('contracts/Achievements.sol')
 const rewards = qtum.contract('contracts/Rewards.sol')
 
-const { encodeMethod, rawCall, getHexAddress } = qtum
 const supportMethodABI = qtumRepository.contracts['contracts/Rewards.sol'].abi.find(method => method.name === 'support')
 const depositMethodABI = qtumRepository.contracts['contracts/Rewards.sol'].abi.find(method => method.name === 'deposit')
 
@@ -36,7 +36,7 @@ const options = {
 }
 
 app({
-  fb, feed, users, achievements, rewards, encodeMethod, rawCall, getHexAddress, token, supportMethodABI, depositMethodABI, options
+  fb, feed, users, achievements, rewards, qtum, token, supportMethodABI, depositMethodABI, options
 }).listen(port, () => {
   console.log(`Running on :${port}\n`)
 })
