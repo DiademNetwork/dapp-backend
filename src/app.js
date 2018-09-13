@@ -1,8 +1,8 @@
 import express from 'express'
 import bodyParser from 'body-parser'
-import { isAddress, isAccountOwner, isAddressOwner, toHexAddress, toContentHash, toUserProfileName } from './helpers'
+import { isAddress, isAccountOwner, isAddressOwner, toContentHash, toUserProfileName } from './helpers'
 
-export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall, token, depositMethodABI, supportMethodABI, options }) => {
+export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall, getHexAddress, token, depositMethodABI, supportMethodABI, options }) => {
   const app = express()
   app.use(bodyParser())
 
@@ -72,7 +72,7 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
         return res.status(500).json({ error: 'INVALID_TOKEN' })
       }
 
-      const hexAddress = toHexAddress(address)
+      const hexAddress = await getHexAddress(address)
 
       const checkedAddressOwner = await isAddressOwner(users, hexAddress, user)
 
@@ -101,7 +101,7 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
         return res.status(500).json({ error: 'INVALID_TOKEN' })
       }
 
-      const hexAddress = toHexAddress(address)
+      const hexAddress = await getHexAddress(address)
 
       const userExists = (await users.call('exists', [hexAddress])).outputs[0]
 
@@ -150,7 +150,7 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
         return res.status(500).json({ error: 'INVALID_TOKEN' })
       }
 
-      const hexAddress = toHexAddress(address)
+      const hexAddress = await getHexAddress(address)
 
       const checkedAddressOwner = await isAddressOwner(users, hexAddress, user)
 
@@ -195,7 +195,7 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
         return res.status(500).json({ error: 'INVALID_TOKEN' })
       }
 
-      const hexAddress = toHexAddress(address)
+      const hexAddress = await getHexAddress(address)
 
       const checkedAddressOwner = await isAddressOwner(users, hexAddress, user)
 
@@ -240,7 +240,7 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
         return res.status(500).json({ error: 'INVALID_ADDRESS' })
       }
 
-      const hexWitness = toHexAddress(witness)
+      const hexWitness = await getHexAddress(witness)
 
       const args = [link, hexWitness]
 
@@ -302,7 +302,7 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
         return res.status(500).json({ error: 'INVALID_TOKEN' })
       }
 
-      const hexAddress = toHexAddress(address)
+      const hexAddress = await getHexAddress(address)
 
       const checkedAddressOwner = await isAddressOwner(users, hexAddress, user)
 
@@ -341,7 +341,7 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
         return res.status(500).json({ error: 'INVALID_TOKEN' })
       }
 
-      const hexAddress = toHexAddress(address)
+      const hexAddress = await getHexAddress(address)
 
       const checkedAddressOwner = await isAddressOwner(users, hexAddress, user)
 
