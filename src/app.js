@@ -38,6 +38,28 @@ export default ({ fb, feed, users, achievements, rewards, encodeMethod, rawCall,
     }
   })
 
+  app.post('/users', async (req, res) => {
+    try {
+      let users = []
+
+      const numberOfUsers = (await users.call('getUsersCount')).outputs[0]
+
+      for (let index = 0; index < numberOfUsers; index++) {
+        const [ userAddress, userAccount, userName ] =
+          (await users.call('getUserByIndex', [index])).outputs
+
+        users.push({
+          userAddress, userAccount, userName
+        })
+      }
+
+      return res.json({ users })
+    } catch (error) {
+      console.error(error)
+      res.status(500).send({ error: error.toString() })
+    }
+  })
+
   app.post('/getAccessToken', async (req, res) => {
     try {
       const { address, user, token } = req.body
