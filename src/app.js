@@ -38,9 +38,9 @@ export default ({ fb, feed, users, achievements, rewards, qtum, token, depositMe
     }
   })
 
-  app.post('/users', async (req, res) => {
+  app.get('/users', async (req, res) => {
     try {
-      let users = []
+      let usersList = []
 
       const numberOfUsers = (await users.call('getUsersCount')).outputs[0]
 
@@ -48,12 +48,12 @@ export default ({ fb, feed, users, achievements, rewards, qtum, token, depositMe
         const [ userAddress, userAccount, userName ] =
           (await users.call('getUserByIndex', [index])).outputs
 
-        users.push({
+        usersList.push({
           userAddress, userAccount, userName
         })
       }
 
-      return res.json({ users })
+      return res.json({ usersList })
     } catch (error) {
       console.error(error)
       res.status(500).send({ error: error.toString() })
@@ -262,11 +262,11 @@ export default ({ fb, feed, users, achievements, rewards, qtum, token, depositMe
     }
   })
 
-  app.post('/encodeSupport', async (req, res) => {
+  app.post('/encode-support', async (req, res) => {
     try {
       const { link } = req.body
 
-      const encodedData = await qtum.encodeMethod(supportMethodABI, [link], options)
+      const encodedData = await qtum.encodeMethod(supportMethodABI, [link])
 
       res.status(500).json({ encodedData })
     } catch (e) {
@@ -275,13 +275,13 @@ export default ({ fb, feed, users, achievements, rewards, qtum, token, depositMe
     }
   })
 
-  app.post('/encodeDeposit', async (req, res) => {
+  app.post('/encode-deposit', async (req, res) => {
     try {
       const { link, witness } = req.body
 
       const witnessAddress = (await users.call('getAddressByAccount', [witness])).outputs[0]
 
-      const encodedData = await qtum.encodeMethod(depositMethodABI, [link, witnessAddress], options)
+      const encodedData = await qtum.encodeMethod(depositMethodABI, [link, witnessAddress])
 
       res.json({ encodedData })
     } catch (e) {
