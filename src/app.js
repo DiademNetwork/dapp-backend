@@ -317,6 +317,25 @@ export default ({ fb, feed, users, achievements, rewards, qtum, token, depositMe
     }
   })
 
+  app.post('/init', async (req, res) => {
+    try {
+      const initializedAddress = (await achievements.call('rewards')).outputs[0]
+
+      if (parseInt(initializedAddress) !== 0) {
+        return res.status(500).json({ error: 'ALREADY_INITIALIZED', initializedAddress })
+      }
+
+      const rewardsAddress = rewards.address
+
+      const { txid } = await achievements.send('initRewards', [rewardsAddress], options)
+
+      res.json({ txid, rewardsAddress })
+    } catch (e) {
+      console.error(e)
+      res.status(500).send({ error: e.toString() })
+    }
+  })
+
   app.post('/support', async (req, res) => {
     try {
       const { rawTx, link, address, user, token } = req.body
@@ -341,7 +360,7 @@ export default ({ fb, feed, users, achievements, rewards, qtum, token, depositMe
 
       console.log('decodedTx', JSON.stringify(decodedTx))
 
-      const { address: txid, executionResult: { excepted } } = await qtum.rawCall('sendrawtransaction', [rawTx])
+      const { address: txid } = await qtum.rawCall('sendrawtransaction', [rawTx])
 
       const userProfileName = await toUserProfileName(fb, user)
 
@@ -353,7 +372,7 @@ export default ({ fb, feed, users, achievements, rewards, qtum, token, depositMe
         verb: 'support'
       })
 
-      res.json({ txid, link, address, excepted, userProfileName, user })
+      res.json({ txid, link, address, userProfileName, user })
     } catch (e) {
       console.error(e)
       res.status(500).send({ error: e.toString() })
