@@ -1,6 +1,6 @@
 import express from 'express'
 import bodyParser from 'body-parser'
-import { isAddress, isAccountOwner, isAddressOwner, toContentHash, toUserProfileName } from './helpers'
+import { isAddress, isAccountOwner, isAddressOwner, toContentHash, toUserProfileName, encodeMethod } from './helpers'
 
 export default ({ fb, feed, users, achievements, rewards, qtum, token, depositMethodABI, supportMethodABI, options }) => {
   const app = express()
@@ -266,9 +266,11 @@ export default ({ fb, feed, users, achievements, rewards, qtum, token, depositMe
     try {
       const { link } = req.body
 
-      const encodedData = await qtum.encodeMethod(supportMethodABI, [link])
+      const address = rewards.address
 
-      res.status(500).json({ encodedData })
+      const encodedData = encodeMethod(supportMethodABI, [link])
+
+      res.json({ address, link, encodedData })
     } catch (e) {
       console.error(e)
       res.status(500).send({ error: e.toString() })
@@ -279,11 +281,17 @@ export default ({ fb, feed, users, achievements, rewards, qtum, token, depositMe
     try {
       const { link, witness } = req.body
 
-      const witnessAddress = (await users.call('getAddressByAccount', [witness])).outputs[0]
+      const address = rewards.address
 
-      const encodedData = await qtum.encodeMethod(depositMethodABI, [link, witnessAddress])
+      const hexWitnessAddress = await qtum.getHexAddress(witness)
 
-      res.json({ encodedData })
+      const ethWitnessAddress = `0x${hexWitnessAddress}`
+
+      console.log(ethWitnessAddress)
+
+      const encodedData = encodeMethod(depositMethodABI, [link, ethWitnessAddress])
+
+      res.json({ address, link, witness, encodedData })
     } catch (e) {
       console.error(e)
       res.status(500).send({ error: e.toString() })
@@ -310,7 +318,11 @@ export default ({ fb, feed, users, achievements, rewards, qtum, token, depositMe
         return res.status(500).json({ error: 'INVALID_ADDRESS_OWNER' })
       }
 
-      const { txid } = await qtum.rawCall('sendrawtransaction', [rawTx])
+      const decodedTx = await qtum.rawCall('decoderawtransaction', [rawTx])
+
+      console.log('decodedTx', JSON.stringify(decodedTx))
+
+      const { address: txid, executionResult: { excepted } } = await qtum.rawCall('sendrawtransaction', [rawTx])
 
       const userProfileName = await toUserProfileName(fb, user)
 
@@ -322,7 +334,7 @@ export default ({ fb, feed, users, achievements, rewards, qtum, token, depositMe
         verb: 'support'
       })
 
-      res.json({ txid, link, address, userProfileName, user })
+      res.json({ txid, link, address, excepted, userProfileName, user })
     } catch (e) {
       console.error(e)
       res.status(500).send({ error: e.toString() })

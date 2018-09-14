@@ -1,6 +1,11 @@
 /* eslint-disable no-trailing-spaces */
 import { Address, crypto } from 'qtumcore-lib'
 import bs58 from 'bs58'
+import ethjs from 'ethjs-abi'
+
+const encodeMethod = (method, values) => {
+  return ethjs.encodeMethod(method, values).substring(2)
+}
 
 const isAddress = (address) => {
   return Address.isValid(address)
@@ -41,6 +46,7 @@ const toUserProfileName = async (fb, user) => {
 }
 
 export {
+  encodeMethod,
   isAddress,
   isAccountOwner,
   isAddressOwner,
