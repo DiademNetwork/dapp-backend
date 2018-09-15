@@ -38,6 +38,25 @@ export default ({ fb, feed, users, achievements, rewards, qtum, token, depositMe
     }
   })
 
+  app.post('/check-qtum-address', async (req, res) => {
+    try {
+      const { user, walletAddress } = req.body
+
+      const hexWalletAddress = await qtum.getHexAddress(walletAddress)
+
+      const address = (await users.call('getAddressByAccount', [user])).outputs[0]
+
+      if (address === hexWalletAddress) {
+        return res.json({ ok: true, user, walletAddress, address })
+      } else {
+        return res.json({ ok: false, user, walletAddress, address })
+      }
+    } catch (error) {
+      console.error(error)
+      res.status(500).send({ error: error.toString() })
+    }
+  })
+
   app.get('/users', async (req, res) => {
     try {
       let usersList = []
@@ -371,7 +390,7 @@ export default ({ fb, feed, users, achievements, rewards, qtum, token, depositMe
         witness: witness,
         target: txid,
         name: userProfileName,
-        verb: 'support'
+        verb: 'deposit'
       })
 
       res.json({ txid, link, witness, address, userProfileName, user })
