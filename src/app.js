@@ -64,8 +64,10 @@ export default ({ fb, feed, users, achievements, rewards, qtum, token, depositMe
       const numberOfUsers = (await users.call('getUsersCount')).outputs[0]
 
       for (let index = 0; index < numberOfUsers; index++) {
-        const [ userAddress, userAccount, userName ] =
+        const [ userHexAddress, userAccount, userName ] =
           (await users.call('getUserByIndex', [index])).outputs
+
+        const userAddress = await qtum.fromHexAddress(userHexAddress)
 
         usersList.push({
           userAddress, userAccount, userName
