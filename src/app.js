@@ -362,7 +362,7 @@ export default ({ fb, feed, users, achievements, rewards, qtum, token, depositMe
 
       console.log('decodedTx', JSON.stringify(decodedTx))
 
-      const { address: txid } = await qtum.rawCall('sendrawtransaction', [rawTx])
+      const txid = await qtum.rawCall('sendrawtransaction', [rawTx])
 
       const userProfileName = await toUserProfileName(fb, user)
 
@@ -401,7 +401,7 @@ export default ({ fb, feed, users, achievements, rewards, qtum, token, depositMe
         return res.status(500).json({ error: 'INVALID_ADDRESS_OWNER' })
       }
 
-      const { txid } = await qtum.rawCall('sendrawtransaction', [rawTx])
+      const txid = await qtum.rawCall('sendrawtransaction', [rawTx])
 
       const userProfileName = await toUserProfileName(fb, user)
 
