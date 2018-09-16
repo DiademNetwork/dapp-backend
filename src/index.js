@@ -32,7 +32,8 @@ const port = process.env.APP_PORT || 3000
 
 const options = {
   senderAddress: process.env.SENDER_ADDRESS,
-  gasLimit: 3000000
+  gasLimit: 500000,
+  gasPrice: 0.0000004
 }
 
 app({
