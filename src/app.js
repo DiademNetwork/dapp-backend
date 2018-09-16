@@ -383,7 +383,7 @@ export default ({ fb, feed, users, achievements, rewards, qtum, token, depositMe
 
   app.post('/deposit', async (req, res) => {
     try {
-      const { rawTx, link, witness, address, user, token } = req.body
+      const { rawTx, link, witness, address, user, token, witnessName } = req.body
 
       if (!isAddress(address)) {
         return res.status(500).json({ error: 'INVALID_ADDRESS' })
@@ -411,6 +411,7 @@ export default ({ fb, feed, users, achievements, rewards, qtum, token, depositMe
         witness: witness,
         target: txid,
         name: userProfileName,
+        witnessName: witnessName,
         verb: 'deposit'
       })
 
